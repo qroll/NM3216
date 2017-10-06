@@ -5,12 +5,10 @@ using UnityEngine;
 public class GameManager : MonoBehaviour {
 
     public Transform enemy;
-    public GameObject[] spawnPoints;
+    public float distFromCamera = 10.0f;
 
-    private static string[] SPAWN_POINT = { "up", "down", "left", "right" };
-
-	// Use this for initialization
-	void Start () {
+    // Use this for initialization
+    void Start () {
         InvokeRepeating("SpawnEnemy", 1.0f, 1.0f);
     }
 	
@@ -21,45 +19,27 @@ public class GameManager : MonoBehaviour {
 
     void SpawnEnemy()
     {
-        int index = Mathf.FloorToInt(Random.value * 4);
-        string spawnAt = SPAWN_POINT[index];
-        Vector3 position = GeneratePosition(spawnAt, index);
-        Quaternion rotation = GenerateRotation(spawnAt);
+        Vector3 position = GeneratePosition();
+        Quaternion rotation = GenerateRotation(position);
         Debug.Log(position + " " + rotation);
         Instantiate(enemy, position, rotation);
     }
 
-    Vector3 GeneratePosition(string spawnAt, int index) {
-        GameObject spawnPoint = spawnPoints[index];
-        float x = spawnPoint.transform.position.x;
-        float y = spawnPoint.transform.position.y;
-        
-        return new Vector3(x, y, 0);
+    Vector3 GeneratePosition() {
+        float min = 0.2f;
+        float max = 0.8f;
+        Vector3 position = Camera.main.ViewportToWorldPoint(new Vector3(Random.Range(min, max), Random.Range(min, max), distFromCamera));
+
+        return position;
     }
 
-    Quaternion GenerateRotation(string spawnAt)
+    Quaternion GenerateRotation(Vector3 position)
     {
-        int angle;
-        switch (spawnAt)
-        {
-            case "up":
-                angle = 0;
-                break;
-            case "down":
-                angle = 180;
-                break;
-            case "left":
-                angle = 90;
-                break;
-            case "right":
-                angle = 270;
-                break;
-            default:
-                angle = 0;
-                break;
-        }
-            
-        return Quaternion.Euler(0, 0, angle);
+        Vector3 direction = new Vector3(0,0,0) - position;
+        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg + 90;
+        Quaternion rotation = Quaternion.AngleAxis(angle, Vector3.forward);
+
+        return rotation;
     }
 
 }
