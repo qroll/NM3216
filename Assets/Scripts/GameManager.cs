@@ -7,6 +7,7 @@ public class GameManager : MonoBehaviour {
     public float distFromCamera = 10.0f;
     public float startDelay = 1.0f;
     public float spawnRate = 1.0f;
+    public CDebug.EDebugLevel debugLevel;
 
     public Transform enemy;
 
@@ -17,6 +18,7 @@ public class GameManager : MonoBehaviour {
     // Use this for initialization
     void Start () {
         InvokeRepeating("SpawnEnemy", startDelay, spawnRate);
+        CDebug.SetDebugLoggingLevel((int) debugLevel);
     }
 	
 	// Update is called once per frame
@@ -28,7 +30,7 @@ public class GameManager : MonoBehaviour {
     {
         Vector3 position = GeneratePosition();
         Quaternion rotation = GenerateRotation(position);
-        Debug.Log(position + " " + rotation);
+        CDebug.Log(CDebug.EDebugLevel.DEBUG, position + " " + rotation);
         Instantiate(enemy, position, rotation);
     }
 

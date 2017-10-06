@@ -18,19 +18,19 @@ public class PlayerController : MonoBehaviour {
     {
         if (Input.GetKey(KeyCode.UpArrow))
         {
-            Debug.Log("up");
+            CDebug.Log(CDebug.EDebugLevel.INFO, "up");
         }
         if (Input.GetKey(KeyCode.DownArrow))
         {
-            Debug.Log("down");
+            CDebug.Log(CDebug.EDebugLevel.INFO, "down");
         }
         if (Input.GetKey(KeyCode.LeftArrow))
         {
-            Debug.Log("left");
+            CDebug.Log(CDebug.EDebugLevel.INFO, "left");
         }
         if (Input.GetKey(KeyCode.RightArrow))
         {
-            Debug.Log("right");
+            CDebug.Log(CDebug.EDebugLevel.INFO, "right");
         }
 
     }
