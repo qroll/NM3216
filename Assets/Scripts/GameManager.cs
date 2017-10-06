@@ -4,15 +4,19 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour {
 
-    public Transform enemy;
     public float distFromCamera = 10.0f;
+    public float startDelay = 1.0f;
+    public float spawnRate = 1.0f;
+
+    public Transform enemy;
+
     private static string[] ZONE_AXES = { "vertical", "horizontal" };
     private float min = 0.2f;
     private float max = 0.8f;
 
     // Use this for initialization
     void Start () {
-        InvokeRepeating("SpawnEnemy", 1.0f, 1.0f);
+        InvokeRepeating("SpawnEnemy", startDelay, spawnRate);
     }
 	
 	// Update is called once per frame
