@@ -6,6 +6,9 @@ public class GameManager : MonoBehaviour {
 
     public Transform enemy;
     public float distFromCamera = 10.0f;
+    private static string[] ZONE_AXES = { "vertical", "horizontal" };
+    private float min = 0.2f;
+    private float max = 0.8f;
 
     // Use this for initialization
     void Start () {
@@ -26,9 +29,17 @@ public class GameManager : MonoBehaviour {
     }
 
     Vector3 GeneratePosition() {
-        float min = 0.2f;
-        float max = 0.8f;
-        Vector3 position = Camera.main.ViewportToWorldPoint(new Vector3(Random.Range(min, max), Random.Range(min, max), distFromCamera));
+        string axis = ZONE_AXES[Mathf.FloorToInt(Random.Range(0, 2))];
+        int sign = Mathf.FloorToInt(Random.Range(0, 2)) == 1 ? 1 : 0;
+
+        Vector3 position;
+        if (axis == "horizontal")
+        {
+            position = Camera.main.ViewportToWorldPoint(new Vector3(Random.Range(min, max), sign, distFromCamera));
+        } else
+        {
+            position = Camera.main.ViewportToWorldPoint(new Vector3(sign, Random.Range(min, max), distFromCamera));
+        }
 
         return position;
     }
