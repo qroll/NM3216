@@ -240,6 +240,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 753829862d65f5849b1ad235a15cdfa7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  gm: {fileID: 1771932142}
 --- !u!1 &299961524
 GameObject:
   m_ObjectHideFlags: 0
@@ -469,6 +470,7 @@ MonoBehaviour:
   - {fileID: 1135218338}
   - {fileID: 929316821}
   - {fileID: 38149023}
+  gm: {fileID: 1771932142}
 --- !u!1 &772563440
 GameObject:
   m_ObjectHideFlags: 0
@@ -675,6 +677,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 753829862d65f5849b1ad235a15cdfa7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  gm: {fileID: 1771932142}
 --- !u!1 &1135218338
 GameObject:
   m_ObjectHideFlags: 0
@@ -807,6 +810,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 753829862d65f5849b1ad235a15cdfa7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  gm: {fileID: 1771932142}
 --- !u!1 &1347138400
 GameObject:
   m_ObjectHideFlags: 0
@@ -1099,6 +1103,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 753829862d65f5849b1ad235a15cdfa7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  gm: {fileID: 1771932142}
 --- !u!1 &1659242119
 GameObject:
   m_ObjectHideFlags: 0
@@ -1160,9 +1165,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   distFromCamera: 10
-  startDelay: 1
-  spawnRate: 1
-  debugLevel: 1
+  startDelay: 0
+  spawnFreqRate: 3
+  deltaSpawnFreqRate: 0.05
+  minSpawnFreqRate: 1
+  spawnNumRate: 1
+  deltaSpawnNumRate: 0.05
+  maxSpawnNumRate: 8
+  debugLevel: 2
   enemy: {fileID: 4994900873364730, guid: 1d8db4154ff0b5f4f8736e636c4e77e5, type: 2}
 --- !u!4 &1771932143
 Transform:

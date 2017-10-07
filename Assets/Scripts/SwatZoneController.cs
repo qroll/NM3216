@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class SwatZoneController : MonoBehaviour {
 
+    public GameManager gm;
+
 	// Use this for initialization
 	void Start () {
 		
@@ -19,6 +21,7 @@ public class SwatZoneController : MonoBehaviour {
         GameObject obj = other.gameObject;
         if (obj.CompareTag("Enemy"))
         {
+            gm.EnemySwatted();
             Object.Destroy(obj);
         }
     }

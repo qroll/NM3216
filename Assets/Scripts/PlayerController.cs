@@ -5,6 +5,7 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour {
 
     public GameObject[] swatters;
+    public GameManager gm;
 
     private static float ACTIVE_TIME = 0.2f;
 
@@ -55,7 +56,7 @@ public class PlayerController : MonoBehaviour {
         GameObject obj = other.gameObject;
         if (obj.CompareTag("Enemy"))
         {
-            GameManager.Instance.EnemyReached(obj);
+            gm.EnemyReached(obj);
         }
     }
 

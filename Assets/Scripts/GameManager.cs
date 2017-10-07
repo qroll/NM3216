@@ -6,7 +6,12 @@ public class GameManager : MonoBehaviour {
 
     public float distFromCamera = 10.0f;
     public float startDelay = 1.0f;
-    public float spawnRate = 1.0f;
+    public float spawnFreqRate = 1.0f;
+    public float deltaSpawnFreqRate = 0.5f;
+    public float minSpawnFreqRate = 0.5f;
+    public float spawnNumRate = 1.0f;
+    public float deltaSpawnNumRate = 1.0f;
+    public float maxSpawnNumRate = 10.0f;
     public CDebug.EDebugLevel debugLevel;
 
     public Transform enemy;
@@ -14,38 +19,34 @@ public class GameManager : MonoBehaviour {
     private static string[] ZONE_AXES = { "vertical", "horizontal" };
     private static float AXIS_MIN = 0.3f;
     private static float AXIS_MAX = 0.7f;
-
-    private static GameManager instance;
-
-    public static GameManager Instance
-    {
-        get
-        {
-            if (instance == null)
-            {
-                instance = new GameManager();
-            }
-
-            return instance;
-        }
-    }
-
+    
+    // Game status
+    private int killCount = 0;
+    private float lastIncreased = 0;
+    
     // Use this for initialization
     void Start () {
-        InvokeRepeating("SpawnEnemy", startDelay, spawnRate);
         CDebug.SetDebugLoggingLevel((int) debugLevel);
     }
 	
 	// Update is called once per frame
 	void Update () {
-
-	}
+        CDebug.Log(CDebug.EDebugLevel.DEBUG, string.Format("time={0} | last update={1}", Time.time, (startDelay + lastIncreased)));
+        if (Time.time - (startDelay + lastIncreased) > spawnFreqRate)
+        {
+            for (int i = 0; i < spawnNumRate; i++)
+            {
+                SpawnEnemy();
+            }
+            lastIncreased = Time.time;
+        }
+    }
 
     void SpawnEnemy()
     {
         Vector3 position = GeneratePosition();
         Quaternion rotation = GenerateRotation(position);
-        CDebug.Log(CDebug.EDebugLevel.DEBUG, position + " " + rotation);
+        CDebug.Log(CDebug.EDebugLevel.TRACE, string.Format("spawn position={0} | rotation={1} | time={2}", position, rotation, Time.time));
         Instantiate(enemy, position, rotation);
     }
 
@@ -72,6 +73,14 @@ public class GameManager : MonoBehaviour {
         Quaternion rotation = Quaternion.AngleAxis(angle, Vector3.forward);
 
         return rotation;
+    }
+
+    public void EnemySwatted()
+    {
+        killCount++;
+        spawnFreqRate = Mathf.Max(spawnFreqRate - deltaSpawnFreqRate, minSpawnFreqRate);
+        spawnNumRate = Mathf.Min(spawnNumRate + deltaSpawnNumRate, maxSpawnNumRate);
+        CDebug.Log(CDebug.EDebugLevel.INFO, "kill count=" + killCount + " | spawn freq=" + spawnFreqRate + " | spawn num=" + spawnNumRate);
     }
 
     public void EnemyReached(GameObject obj)
