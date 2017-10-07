@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class Movement : MonoBehaviour {
 
+    public bool isTrapped = false;
+
 	// Use this for initialization
 	void Start () {
 		
@@ -11,6 +13,10 @@ public class Movement : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        transform.Translate(new Vector3(0, -1, 0) * Time.deltaTime);
+        if (!isTrapped)
+        {
+            transform.Translate(new Vector3(0, -1, 0) * Time.deltaTime);
+        }
+        
 	}
 }

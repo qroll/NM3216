@@ -12,8 +12,23 @@ public class GameManager : MonoBehaviour {
     public Transform enemy;
 
     private static string[] ZONE_AXES = { "vertical", "horizontal" };
-    private float min = 0.2f;
-    private float max = 0.8f;
+    private static float AXIS_MIN = 0.3f;
+    private static float AXIS_MAX = 0.7f;
+
+    private static GameManager instance;
+
+    public static GameManager Instance
+    {
+        get
+        {
+            if (instance == null)
+            {
+                instance = new GameManager();
+            }
+
+            return instance;
+        }
+    }
 
     // Use this for initialization
     void Start () {
@@ -41,10 +56,10 @@ public class GameManager : MonoBehaviour {
         Vector3 position;
         if (axis == "horizontal")
         {
-            position = Camera.main.ViewportToWorldPoint(new Vector3(Random.Range(min, max), sign, distFromCamera));
+            position = Camera.main.ViewportToWorldPoint(new Vector3(Random.Range(AXIS_MIN, AXIS_MAX), sign, distFromCamera));
         } else
         {
-            position = Camera.main.ViewportToWorldPoint(new Vector3(sign, Random.Range(min, max), distFromCamera));
+            position = Camera.main.ViewportToWorldPoint(new Vector3(sign, Random.Range(AXIS_MIN, AXIS_MAX), distFromCamera));
         }
 
         return position;
@@ -57,6 +72,12 @@ public class GameManager : MonoBehaviour {
         Quaternion rotation = Quaternion.AngleAxis(angle, Vector3.forward);
 
         return rotation;
+    }
+
+    public void EnemyReached(GameObject obj)
+    {
+        Movement control = (Movement) obj.GetComponent("Movement");
+        control.isTrapped = true;
     }
 
 }
