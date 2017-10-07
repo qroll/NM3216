@@ -12,6 +12,7 @@ public class GameManager : MonoBehaviour {
     public float spawnNumRate = 1.0f;
     public float deltaSpawnNumRate = 1.0f;
     public float maxSpawnNumRate = 10.0f;
+    public int maxSpawn = 3;
     public CDebug.EDebugLevel debugLevel;
 
     public Transform enemy;
@@ -19,18 +20,29 @@ public class GameManager : MonoBehaviour {
     private static string[] ZONE_AXES = { "vertical", "horizontal" };
     private static float AXIS_MIN = 0.3f;
     private static float AXIS_MAX = 0.7f;
-    
+
     // Game status
+    private bool isGameOver = false;
     private int killCount = 0;
     private float lastIncreased = 0;
-    
+    private Dictionary<string, Queue<GameObject>> infestedZones = new Dictionary<string, Queue<GameObject>>();
+
     // Use this for initialization
     void Start () {
         CDebug.SetDebugLoggingLevel((int) debugLevel);
+        infestedZones.Add("up", new Queue<GameObject>());
+        infestedZones.Add("down", new Queue<GameObject>());
+        infestedZones.Add("left", new Queue<GameObject>());
+        infestedZones.Add("right", new Queue<GameObject>());
     }
 	
 	// Update is called once per frame
 	void Update () {
+        if (isGameOver)
+        {
+            return;
+        }
+
         CDebug.Log(CDebug.EDebugLevel.DEBUG, string.Format("time={0} | last update={1}", Time.time, (startDelay + lastIncreased)));
         if (Time.time - (startDelay + lastIncreased) > spawnFreqRate)
         {
@@ -44,23 +56,47 @@ public class GameManager : MonoBehaviour {
 
     void SpawnEnemy()
     {
-        Vector3 position = GeneratePosition();
+        string zone = GenerateZone();
+        Vector3 position = GeneratePosition(zone);
         Quaternion rotation = GenerateRotation(position);
         CDebug.Log(CDebug.EDebugLevel.TRACE, string.Format("spawn position={0} | rotation={1} | time={2}", position, rotation, Time.time));
-        Instantiate(enemy, position, rotation);
+        GameObject spawn = Instantiate(enemy, position, rotation).gameObject;
+
+        Movement control = (Movement) spawn.GetComponent("Movement");
+        control.zone = zone;
     }
 
-    Vector3 GeneratePosition() {
+    string GenerateZone()
+    {
         string axis = ZONE_AXES[Mathf.FloorToInt(Random.Range(0, 2))];
         int sign = Mathf.FloorToInt(Random.Range(0, 2)) == 1 ? 1 : 0;
 
-        Vector3 position;
         if (axis == "horizontal")
         {
-            position = Camera.main.ViewportToWorldPoint(new Vector3(Random.Range(AXIS_MIN, AXIS_MAX), sign, distFromCamera));
+            return sign == 1 ? "right" : "left";
         } else
         {
-            position = Camera.main.ViewportToWorldPoint(new Vector3(sign, Random.Range(AXIS_MIN, AXIS_MAX), distFromCamera));
+            return sign == 1 ? "up" : "down";
+        }
+    }
+
+    Vector3 GeneratePosition(string zone) {
+        // string axis = ZONE_AXES[Mathf.FloorToInt(Random.Range(0, 2))];
+        // int sign = Mathf.FloorToInt(Random.Range(0, 2)) == 1 ? 1 : 0;
+
+        Vector3 position;
+        if (zone == "left")
+        {
+            position = Camera.main.ViewportToWorldPoint(new Vector3(Random.Range(AXIS_MIN, 0.5f), 0, distFromCamera));
+        } else if (zone == "right")
+        {
+            position = Camera.main.ViewportToWorldPoint(new Vector3(Random.Range(0.5f, AXIS_MAX), 1, distFromCamera));
+        } else if (zone == "up")
+        {
+            position = Camera.main.ViewportToWorldPoint(new Vector3(0, Random.Range(0.5f, AXIS_MAX), distFromCamera));
+        } else
+        {
+            position = Camera.main.ViewportToWorldPoint(new Vector3(1, Random.Range(AXIS_MIN, 0.5f), distFromCamera));
         }
 
         return position;
@@ -87,6 +123,16 @@ public class GameManager : MonoBehaviour {
     {
         Movement control = (Movement) obj.GetComponent("Movement");
         control.isTrapped = true;
+        Queue<GameObject> queue = infestedZones[control.zone];
+        
+        if (queue.Count >= 3)
+        {
+            isGameOver = true;
+            CDebug.Log(CDebug.EDebugLevel.INFO, "game over");
+        } else
+        {
+            queue.Enqueue(obj);
+        }
     }
 
 }

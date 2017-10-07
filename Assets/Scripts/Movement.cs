@@ -5,6 +5,7 @@ using UnityEngine;
 public class Movement : MonoBehaviour {
 
     public bool isTrapped = false;
+    public string zone;
 
 	// Use this for initialization
 	void Start () {
