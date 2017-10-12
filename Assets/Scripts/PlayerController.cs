@@ -4,53 +4,33 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour {
 
-    public GameObject[] swatters;
     public GameManager gm;
-
-    private static float ACTIVE_TIME = 0.2f;
 
 	// Use this for initialization
 	void Start () {
-        foreach (GameObject swatter in swatters)
-        {
-            swatter.SetActive(false);
-        }
+        
 	}
 	
 	// Update is called once per frame
 	void Update () {
-		
-	}
-
-    void FixedUpdate()
-    {
-        if (Input.GetKey(KeyCode.UpArrow))
+        if (Input.GetKeyDown(KeyCode.UpArrow))
         {
-            CDebug.Log(CDebug.EDebugLevel.INFO, "up");
-            swatters[0].SetActive(true);
-            StartCoroutine(DisableSwatter(ACTIVE_TIME, swatters[0]));
+            gm.Swat("up");
         }
-        if (Input.GetKey(KeyCode.DownArrow))
+        if (Input.GetKeyDown(KeyCode.DownArrow))
         {
-            CDebug.Log(CDebug.EDebugLevel.INFO, "down");
-            swatters[1].SetActive(true);
-            StartCoroutine(DisableSwatter(ACTIVE_TIME, swatters[1]));
+            gm.Swat("down");
         }
-        if (Input.GetKey(KeyCode.LeftArrow))
+        if (Input.GetKeyDown(KeyCode.LeftArrow))
         {
-            CDebug.Log(CDebug.EDebugLevel.INFO, "left");
-            swatters[2].SetActive(true);
-            StartCoroutine(DisableSwatter(ACTIVE_TIME, swatters[2]));
+            gm.Swat("left");
         }
-        if (Input.GetKey(KeyCode.RightArrow))
+        if (Input.GetKeyDown(KeyCode.RightArrow))
         {
-            CDebug.Log(CDebug.EDebugLevel.INFO, "right");
-            swatters[03].SetActive(true);
-            StartCoroutine(DisableSwatter(ACTIVE_TIME, swatters[3]));
+            gm.Swat("right");
         }
-
     }
-
+    
     void OnTriggerEnter2D(Collider2D other)
     {
         GameObject obj = other.gameObject;
@@ -58,12 +38,6 @@ public class PlayerController : MonoBehaviour {
         {
             gm.EnemyReached(obj);
         }
-    }
-
-    IEnumerator DisableSwatter(float delay, GameObject obj)
-    {
-        yield return new WaitForSeconds(delay);
-        obj.SetActive(false);
     }
 
 }

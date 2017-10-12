@@ -1180,6 +1180,7 @@ MonoBehaviour:
   spawnNumRate: 1
   deltaSpawnNumRate: 0.05
   maxSpawnNumRate: 8
+  maxSpawn: 3
   debugLevel: 2
   enemy: {fileID: 4994900873364730, guid: 1d8db4154ff0b5f4f8736e636c4e77e5, type: 2}
 --- !u!4 &1771932143

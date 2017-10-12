@@ -16,10 +16,12 @@ public class GameManager : MonoBehaviour {
     public CDebug.EDebugLevel debugLevel;
 
     public Transform enemy;
+    public GameObject[] swatters;
 
     private static string[] ZONE_AXES = { "vertical", "horizontal" };
     private static float AXIS_MIN = 0.3f;
     private static float AXIS_MAX = 0.7f;
+    private static float ACTIVE_TIME = 0.2f;
 
     // Game status
     private bool isGameOver = false;
@@ -30,10 +32,18 @@ public class GameManager : MonoBehaviour {
     // Use this for initialization
     void Start () {
         CDebug.SetDebugLoggingLevel((int) debugLevel);
+
+        // initialise infested zones
         infestedZones.Add("up", new Queue<GameObject>());
         infestedZones.Add("down", new Queue<GameObject>());
         infestedZones.Add("left", new Queue<GameObject>());
         infestedZones.Add("right", new Queue<GameObject>());
+        
+        // initialise swatters
+        foreach (GameObject swatter in swatters)
+        {
+            swatter.SetActive(false);
+        }
     }
 	
 	// Update is called once per frame
@@ -85,13 +95,13 @@ public class GameManager : MonoBehaviour {
         // int sign = Mathf.FloorToInt(Random.Range(0, 2)) == 1 ? 1 : 0;
 
         Vector3 position;
-        if (zone == "left")
-        {
-            position = Camera.main.ViewportToWorldPoint(new Vector3(Random.Range(AXIS_MIN, 0.5f), 0, distFromCamera));
-        } else if (zone == "right")
+        if (zone == "up")
         {
             position = Camera.main.ViewportToWorldPoint(new Vector3(Random.Range(0.5f, AXIS_MAX), 1, distFromCamera));
-        } else if (zone == "up")
+        } else if (zone == "down")
+        {
+            position = Camera.main.ViewportToWorldPoint(new Vector3(Random.Range(AXIS_MIN, 0.5f), 0, distFromCamera));
+        } else if (zone == "left")
         {
             position = Camera.main.ViewportToWorldPoint(new Vector3(0, Random.Range(0.5f, AXIS_MAX), distFromCamera));
         } else
@@ -111,6 +121,38 @@ public class GameManager : MonoBehaviour {
         return rotation;
     }
 
+    public void Swat(string zone)
+    {
+        CDebug.Log(CDebug.EDebugLevel.INFO, zone);
+        Queue<GameObject> queue = infestedZones[zone];
+
+        if (queue.Count > 0)
+        {
+            CDebug.Log(CDebug.EDebugLevel.TRACE, "destroying one bug in infestation zone");
+            Object.Destroy(queue.Dequeue());
+        } else
+        {
+            int i = -1;
+            switch (zone)
+            {
+                case "up": i = 0; break;
+                case "down": i = 1; break;
+                case "left": i = 2; break;
+                case "right": i = 3; break;
+            }
+
+            CDebug.Log(CDebug.EDebugLevel.TRACE, "destroying all bugs");
+            swatters[i].SetActive(true);
+            StartCoroutine(DisableSwatter(ACTIVE_TIME, swatters[i]));
+        }
+    }
+
+    IEnumerator DisableSwatter(float delay, GameObject obj)
+    {
+        yield return new WaitForSeconds(delay);
+        obj.SetActive(false);
+    }
+
     public void EnemySwatted()
     {
         killCount++;
@@ -124,14 +166,12 @@ public class GameManager : MonoBehaviour {
         Movement control = (Movement) obj.GetComponent("Movement");
         control.isTrapped = true;
         Queue<GameObject> queue = infestedZones[control.zone];
-        
+        queue.Enqueue(obj);
+
         if (queue.Count >= 3)
         {
             isGameOver = true;
             CDebug.Log(CDebug.EDebugLevel.INFO, "game over");
-        } else
-        {
-            queue.Enqueue(obj);
         }
     }
 
