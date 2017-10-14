@@ -6,6 +6,7 @@ public class Movement : MonoBehaviour {
 
     public bool isTrapped = false;
     public string zone;
+    public float movement = 1;
 
 	// Use this for initialization
 	void Start () {
@@ -16,7 +17,7 @@ public class Movement : MonoBehaviour {
 	void Update () {
         if (!isTrapped)
         {
-            transform.Translate(new Vector3(0, -1, 0) * Time.deltaTime);
+            transform.Translate(movement * new Vector3(0, -1, 0) * Time.deltaTime);
         }
         
 	}
