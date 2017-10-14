@@ -36,13 +36,13 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1967587686203930}
-  m_LocalRotation: {x: -0, y: -0, z: 0.9999973, w: 0.0023480298}
-  m_LocalPosition: {x: -1.52, y: -0.42, z: 0}
-  m_LocalScale: {x: 0.08, y: 0.08, z: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 0.1, y: 0.1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 179.731}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!50 &50372235823403658
 Rigidbody2D:
   serializedVersion: 4
@@ -90,6 +90,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isTrapped: 0
+  zone: 
 --- !u!212 &212707039433079472
 SpriteRenderer:
   m_ObjectHideFlags: 1
@@ -122,7 +123,7 @@ SpriteRenderer:
   m_SortingLayerID: 1751817035
   m_SortingLayer: 2
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 6c8dd3a2be8427c468ef4d70fb13eb57, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 5ae59af692c2be44cb2f380762932c4e, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0

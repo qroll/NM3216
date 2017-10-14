@@ -5,6 +5,10 @@ TagManager:
   serializedVersion: 2
   tags:
   - Enemy
+  - ZoneUp
+  - ZoneDown
+  - ZoneLeft
+  - ZoneRight
   layers:
   - Default
   - TransparentFX

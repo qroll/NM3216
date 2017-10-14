@@ -15,19 +15,19 @@ public class PlayerController : MonoBehaviour {
 	void Update () {
         if (Input.GetKeyDown(KeyCode.UpArrow))
         {
-            gm.Swat("up");
+            gm.Swat("Up");
         }
         if (Input.GetKeyDown(KeyCode.DownArrow))
         {
-            gm.Swat("down");
+            gm.Swat("Down");
         }
         if (Input.GetKeyDown(KeyCode.LeftArrow))
         {
-            gm.Swat("left");
+            gm.Swat("Left");
         }
         if (Input.GetKeyDown(KeyCode.RightArrow))
         {
-            gm.Swat("right");
+            gm.Swat("Right");
         }
     }
     
