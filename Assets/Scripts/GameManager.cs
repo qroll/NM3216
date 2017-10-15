@@ -20,6 +20,9 @@ public class GameManager : MonoBehaviour {
     public Sprite frogEnabledSprite;
     public GameObject[] swatters;
     public GameObject[] frogs;
+    public GameObject menuCanvas;
+    public GameObject inGameCanvas;
+    public GameObject endGameCanvas;
 
     public const string ZONE_UP = "Up";
     public const string ZONE_DOWN = "Down";
@@ -29,7 +32,7 @@ public class GameManager : MonoBehaviour {
     private static string[] ZONE_AXES = { "Vertical", "Horizontal" };
     private static float AXIS_MIN = 0.3f;
     private static float AXIS_MAX = 0.7f;
-    private static float DISABLE_TIME = 2.0f;
+    private static float STUN_TIME = 2.0f;
 
     // Game status
     private bool isGameOver = false;
@@ -58,8 +61,8 @@ public class GameManager : MonoBehaviour {
         swatterSprites.Add("Down", frogs[1]);
         swatterSprites.Add("Left", frogs[2]);
         swatterSprites.Add("Right", frogs[3]);
-        
-        GameObject.Find("MenuCanvas").SetActive(false);
+
+        menuCanvas.SetActive(false);
     }
 	
 	// Update is called once per frame
@@ -80,6 +83,7 @@ public class GameManager : MonoBehaviour {
         }
     }
 
+    // Spawns an enemy tagged with its corresponding zone
     void SpawnEnemy()
     {
         string zone = GenerateZone();
@@ -95,6 +99,7 @@ public class GameManager : MonoBehaviour {
         control.zone = zone;
     }
 
+    // Returns a random zone: Up, Down, Left or Right
     string GenerateZone()
     {
         string axis = ZONE_AXES[Mathf.FloorToInt(Random.Range(0, 2))];
@@ -109,11 +114,10 @@ public class GameManager : MonoBehaviour {
         }
     }
 
+    // Returns a spawning position at the edge of the screen within the specified zone
     Vector3 GeneratePosition(string zone) {
-        // string axis = ZONE_AXES[Mathf.FloorToInt(Random.Range(0, 2))];
-        // int sign = Mathf.FloorToInt(Random.Range(0, 2)) == 1 ? 1 : 0;
-
         Vector3 position;
+
         if (zone == ZONE_UP)
         {
             position = Camera.main.ViewportToWorldPoint(new Vector3(Random.Range(0.5f, AXIS_MAX), 1, distFromCamera));
@@ -131,6 +135,7 @@ public class GameManager : MonoBehaviour {
         return position;
     }
 
+    // Returns the rotation needed for a game object to face the origin
     Quaternion GenerateRotation(Vector3 position)
     {
         Vector3 direction = new Vector3(0,0,0) - position;
@@ -140,10 +145,13 @@ public class GameManager : MonoBehaviour {
         return rotation;
     }
 
+    // Swats an enemy that is already in the infestation zone, or swats the
+    // enemy closest to the player in the specified zone
     public void Swat(string zone)
     {
         CDebug.Log(CDebug.EDebugLevel.INFO, zone);
         
+        // prioritize enemies in the infestation zone
         if (infestationZone.Count > 0)
         {
             CDebug.Log(CDebug.EDebugLevel.TRACE, "destroying bug in infestation zone");
@@ -154,23 +162,25 @@ public class GameManager : MonoBehaviour {
         }
 
         GameObject closest = FindClosestEnemy(zone);
-
         bool isSwatterActive = swatterEnabled[zone];
 
         if (isSwatterActive && closest != null)
         {
+            // if swatter is enabled and at least one enemy is within the swat zone,
+            // destroy the closest enemy
             AnimateFrog(zone, closest, false);
             Object.Destroy(closest.transform.parent.gameObject);
         } else if (isSwatterActive)
         {
-            // disable the swatter temporarily
+            // no enemy was found within the swat zone, disable the swatter temporarily
             swatterEnabled[zone] = false;
             SpriteRenderer sr = swatterSprites[zone].GetComponent<SpriteRenderer>();
             sr.sprite = frogDisabledSprite;
-            StartCoroutine(EnableSwatter(DISABLE_TIME, zone));
+            StartCoroutine(EnableSwatter(STUN_TIME, zone));
         }
     }
 
+    // Returns the closest enemy in the swat zone, or null if none were found
     private GameObject FindClosestEnemy(string zone)
     {
         GameObject[] gos = GameObject.FindGameObjectsWithTag("Zone" + zone);
@@ -196,6 +206,23 @@ public class GameManager : MonoBehaviour {
         return closest;
     }
 
+    IEnumerator DisableSwatter(float delay, GameObject obj)
+    {
+        yield return new WaitForSeconds(delay);
+        obj.SetActive(false);
+    }
+
+    IEnumerator EnableSwatter(float delay, string zone)
+    {
+        yield return new WaitForSeconds(delay);
+        swatterEnabled[zone] = true;
+        SpriteRenderer sr = swatterSprites[zone].GetComponent<SpriteRenderer>();
+        sr.sprite = frogEnabledSprite;
+    }
+
+    // Animates the frog swatting
+    // The tongue extends towards the specified enemy and retracts afterwards
+    // If turn bool is true, the frog will turn around first
     private void AnimateFrog(string zone, GameObject obj, bool turn)
     {
         GameObject frog = swatterSprites[zone];
@@ -208,7 +235,9 @@ public class GameManager : MonoBehaviour {
         ExtendTongue(frog, obj, turn);
         StartCoroutine(RetractTongue(frog, originalScale, originalPosition, originalRotation, turn));
     }
-
+    
+    // Stretch the tongue to the current position of the specified enemy
+    // TODO: improve tongue animation; it's the wrong length and isn't pointing in the right direction
     void ExtendTongue(GameObject frog, GameObject enemy, bool turn)
     {
         if (turn)
@@ -245,20 +274,8 @@ public class GameManager : MonoBehaviour {
         }
     }
 
-    IEnumerator DisableSwatter(float delay, GameObject obj)
-    {
-        yield return new WaitForSeconds(delay);
-        obj.SetActive(false);
-    }
-
-    IEnumerator EnableSwatter(float delay, string zone)
-    {
-        yield return new WaitForSeconds(delay);
-        swatterEnabled[zone] = true;
-        SpriteRenderer sr = swatterSprites[zone].GetComponent<SpriteRenderer>();
-        sr.sprite = frogEnabledSprite;
-    }
-
+    // Inform GameManager that an enemy has been successfully swatted
+    // TODO: track specific enemy types and increase difficulty
     public void EnemySwatted()
     {
         killCount++;
@@ -267,6 +284,7 @@ public class GameManager : MonoBehaviour {
         CDebug.Log(CDebug.EDebugLevel.INFO, "kill count=" + killCount + " | spawn freq=" + spawnFreqRate + " | spawn num=" + spawnNumRate);
     }
 
+    // Inform GameManager that an enemy has reached the infestation zone
     public void EnemyReached(GameObject obj)
     {
         Movement control = (Movement) obj.GetComponent("Movement");
@@ -275,9 +293,56 @@ public class GameManager : MonoBehaviour {
 
         if (infestationZone.Count >= 3)
         {
-            isGameOver = true;
             CDebug.Log(CDebug.EDebugLevel.INFO, "game over");
+            isGameOver = true;
+            endGameCanvas.SetActive(true);
         }
+    }
+
+    public void OnPauseButton()
+    {
+        Time.timeScale = 0;
+
+        menuCanvas.SetActive(true);
+    }
+
+    public void OnResumeButton()
+    {
+        Time.timeScale = 1.0f;
+
+        menuCanvas.SetActive(false);
+    }
+
+    public void OnPlayButton()
+    {
+        menuCanvas.SetActive(false);
+        endGameCanvas.SetActive(false);
+        
+        // enable all swatters
+        swatterEnabled.Clear();
+        swatterEnabled.Add("Up", true);
+        swatterEnabled.Add("Down", true);
+        swatterEnabled.Add("Left", true);
+        swatterEnabled.Add("Right", true);
+
+        // reset frog sprites to normal state
+        foreach (GameObject sprite in swatterSprites.Values)
+        {
+            SpriteRenderer sr = sprite.GetComponent<SpriteRenderer>();
+            sr.sprite = frogEnabledSprite;
+        }
+
+        // remove all remaining enemies
+        foreach (GameObject obj in GameObject.FindGameObjectsWithTag("Enemy"))
+        {
+            Object.Destroy(obj);
+        }
+
+        // reset game state
+        isGameOver = false;
+        killCount = 0;
+        lastIncreased = 0;
+        infestationZone.Clear();
     }
 
 }
