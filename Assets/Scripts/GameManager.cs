@@ -492,19 +492,9 @@ public class GameManager : MonoBehaviour {
 
     void UpdateInfestationCount(int count)
     {
+        CDebug.Log(CDebug.EDebugLevel.DEBUG, "count=" + count);
         infestationCount = count;
-        switch (infestationCount)
-        {
-            case 0:
-                anim.SetTrigger("makeNormal");
-                break;
-            case 1:
-                anim.SetTrigger("makeWarning");
-                break;
-            case 2:
-                anim.SetTrigger("makeAwake");
-                break;
-        }
+        anim.SetInteger("count", infestationCount);
     }
 
 }

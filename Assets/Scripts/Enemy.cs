@@ -6,7 +6,7 @@ public class Enemy : MonoBehaviour {
     public float movement = 1;
 
     public float angle = 0;
-    public float radius = 0.2f;
+    public float radius = 0.1f;
     public Vector3 pivot;
 
     public int hitsLeft = 1;
