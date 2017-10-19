@@ -6,9 +6,17 @@ public class Enemy : MonoBehaviour {
     public float movement = 1;
 
     public float angle = 0;
-    public float radius = 0.5f;
+    public float radius = 0.2f;
+    public Vector3 pivot;
 
     public int hitsLeft = 1;
+    public string zone;
+    public Enemy.Type type;
+
+    public enum Type
+    {
+        BEE, LADYBUG, MAX
+    }
 
     // Use this for initialization
     void Start()
@@ -21,8 +29,9 @@ public class Enemy : MonoBehaviour {
     {
         if (isTrapped)
         {
-            float x = radius * Mathf.Sin(angle);
-            float y = radius * Mathf.Cos(angle);
+            /*
+            float x = radius * Mathf.Sin(angle) + pivot.x;
+            float y = radius * Mathf.Cos(angle) + pivot.y;
             Vector3 position = new Vector3(x, y, transform.position.z);
 
             // update position and rotation around the pivot point
@@ -30,6 +39,7 @@ public class Enemy : MonoBehaviour {
             transform.right = position;
 
             angle += Time.deltaTime;
+            */
         } else
         {
             transform.Translate(movement * new Vector3(0, -1, 0) * Time.deltaTime);
