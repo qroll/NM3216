@@ -37,6 +37,7 @@ public class GameManager : MonoBehaviour {
 
     public Transform enemyPrefab;
     public GameObject[] frogs;
+    public GameObject babyFrog;
     public AudioSource audioSource;
     public AudioClip sound;
 
@@ -76,6 +77,8 @@ public class GameManager : MonoBehaviour {
     private Dictionary<Enemy.Type, float> lastIncreasedPerEnemy;
     private Enemy.Type highestEnemyType;
 
+    private Animator anim;
+
     // Initial values
     private static Dictionary<Enemy.Type, float> initialSpawnRatePerEnemy = new Dictionary<Enemy.Type, float>()
     {
@@ -100,6 +103,13 @@ public class GameManager : MonoBehaviour {
     // Use this for initialization
     void Start()
     {
+        /*
+        float s_baseOrthographicSize = Screen.height / 32.0f / 2.0f;
+        Camera.main.orthographicSize = s_baseOrthographicSize;
+        */
+
+        anim = babyFrog.GetComponent<Animator>();
+
         CDebug.SetDebugLoggingLevel((int) debugLevel);
         
         frogInZone.Add("Up", frogs[0]);
@@ -195,10 +205,10 @@ public class GameManager : MonoBehaviour {
             position = Camera.main.ViewportToWorldPoint(new Vector3(Random.Range(AXIS_MIN, 0.5f), 0, distFromCamera));
         } else if (zone == ZONE_LEFT)
         {
-            position = Camera.main.ViewportToWorldPoint(new Vector3(0, Random.Range(0.5f, AXIS_MAX), distFromCamera));
+            position = Camera.main.ViewportToWorldPoint(new Vector3(0.25f, Random.Range(0.5f, AXIS_MAX), distFromCamera));
         } else
         {
-            position = Camera.main.ViewportToWorldPoint(new Vector3(1, Random.Range(AXIS_MIN, 0.5f), distFromCamera));
+            position = Camera.main.ViewportToWorldPoint(new Vector3(0.75f, Random.Range(AXIS_MIN, 0.5f), distFromCamera));
         }
 
         return position;
@@ -224,9 +234,8 @@ public class GameManager : MonoBehaviour {
         if (infestationZones[zone].Count > 0)
         {
             GameObject enemy = infestationZones[zone].Dequeue();
-            infestationCount--;
-            AnimateFrogTongue(zone, enemy, true);
-            Object.Destroy(enemy);
+            UpdateInfestationCount(infestationCount - 1);
+            EatAndDestroyEnemy(zone, enemy);
             return;
         }
 
@@ -237,12 +246,13 @@ public class GameManager : MonoBehaviour {
         {
             // if swatter is enabled and at least one enemy is within the swat zone,
             // destroy the closest enemy
-            AnimateFrogTongue(zone, closest, false);
-            audioSource.PlayOneShot(sound);
             if (closest.GetComponent<Enemy>().Swat())
             {
+                EatAndDestroyEnemy(zone, closest);
                 EnemySwatted(closest);
-                Object.Destroy(closest);
+            } else
+            {
+                EatEnemy(zone, closest);
             }
         } else if (isSwatterActive)
         {
@@ -294,57 +304,62 @@ public class GameManager : MonoBehaviour {
         sr.sprite = frogEnabledSprite;
     }
 
-    // Animates the frog
-    // The tongue extends towards the specified enemy and retracts afterwards
-    // If turn bool is true, the frog will turn around first
-    private void AnimateFrogTongue(string zone, GameObject enemy, bool turn)
+    void EatEnemy(string zone, GameObject enemy)
+    {
+        audioSource.PlayOneShot(sound);
+        AnimateFrog(zone, enemy);
+    }
+
+    void EatAndDestroyEnemy(string zone, GameObject enemy)
+    {
+        audioSource.PlayOneShot(sound);
+        AnimateFrog(zone, enemy);
+        Object.Destroy(enemy);
+    }
+
+    private void AnimateFrog(string zone, GameObject enemy)
     {
         GameObject frog = frogInZone[zone];
         Transform tongue = frog.transform.Find("tongue");
-
-        Vector3 originalScale = tongue.localScale;
-        Vector3 originalPosition = tongue.position;
-        Quaternion originalRotation = tongue.rotation;
+        Transform tongueLength = tongue.transform.Find("tongue-length");
         
-        ExtendTongue(frog, enemy, turn);
-        StartCoroutine(RetractTongue(frog, originalScale, originalPosition, originalRotation, turn));
+        Vector3 direction = frog.transform.position - enemy.transform.position;
+        frog.transform.up = direction.normalized;
+
+        float targetSize = direction.magnitude;
+        float currentSize = tongueLength.GetComponent<Renderer>().bounds.size.y;
+        float scale = targetSize / currentSize;
+        
+        tongueLength.localScale = new Vector3(1, scale, 1);
+        tongueLength.transform.localPosition = new Vector3(0, -targetSize/2 + 1, 0);
+        
+        StartCoroutine(ResetFrog(zone));
     }
     
-    // Stretch the tongue to the current position of the specified enemy
-    // TODO: improve tongue animation; it's the wrong length and isn't pointing in the right direction
-    void ExtendTongue(GameObject frog, GameObject enemy, bool turn)
-    {
-        if (turn)
-        {
-            frog.transform.Rotate(new Vector3(0, 0, 180));
-        }
-
-        Transform tongue = frog.transform.Find("tongue");
-
-        Vector3 direction = enemy.transform.position - tongue.position;
-        float targetSize = direction.magnitude;
-        Vector3 localScale = tongue.localScale;
-        
-        float currentSize = tongue.Find("tongue-length").GetComponent<Renderer>().bounds.size.y;
-        float scale = localScale.y * (targetSize / currentSize);
-
-        tongue.localScale = new Vector3(localScale.x, scale, localScale.z);
-        
-        tongue.LookAt(Vector3.forward, Vector3.Cross(Vector3.forward, direction));
-        tongue.localRotation = tongue.localRotation * Quaternion.AngleAxis(-90, Vector3.forward);
-    }
-
-    IEnumerator RetractTongue(GameObject frog, Vector3 originalScale, Vector3 originalPosition, Quaternion originalRotation, bool turn)
+    IEnumerator ResetFrog(string zone)
     {
         yield return new WaitForSeconds(0.2f);
-        Transform tongue = frog.transform.Find("tongue");
+        GameObject frog = frogInZone[zone];
+        Transform tongueLength = frog.transform.Find("tongue").Find("tongue-length");
 
         // reset the sprite
-        tongue.localScale = new Vector3(1, 0.1f, 1);
-        tongue.rotation = originalRotation;
-        if (turn)
+        tongueLength.localScale = new Vector3(1, 1, 1);
+        tongueLength.localPosition = new Vector3(0, 0, 0);
+
+        switch (zone)
         {
-            frog.transform.Rotate(new Vector3(0, 0, 180));
+            case "Up":
+                frog.transform.up = Vector3.down;
+                break;
+            case "Down":
+                frog.transform.right = Vector3.left;
+                break;
+            case "Left":
+                frog.transform.right = Vector3.down;
+                break;
+            case "Right":
+                frog.transform.right = Vector3.up;
+                break;
         }
     }
 
@@ -393,12 +408,11 @@ public class GameManager : MonoBehaviour {
         Enemy control = (Enemy) obj.GetComponent("Enemy");
         control.angle = Mathf.Atan2(obj.transform.position.y, obj.transform.position.x);
         control.isTrapped = true;
-        obj.transform.Translate(new Vector3(0, -0.5f, 0));
 
         string zone = control.zone;
         infestationZones[zone].Enqueue(obj);
-        infestationCount++;
-        //control.pivot = frogInZone[zone].transform.position;
+        UpdateInfestationCount(infestationCount + 1);
+        control.pivot = frogInZone[zone].transform.position;
 
         if (infestationCount >= maxNumEnemies)
         {
@@ -472,6 +486,25 @@ public class GameManager : MonoBehaviour {
         currSpawnNumPerEnemy = new Dictionary<Enemy.Type, float>(initialSpawnNumPerEnemy);
         lastIncreasedPerEnemy = new Dictionary<Enemy.Type, float>(initialLastIncreasedPerEnemy);
         highestEnemyType = initialEnemyType;
+
+        UpdateInfestationCount(0);
+    }
+
+    void UpdateInfestationCount(int count)
+    {
+        infestationCount = count;
+        switch (infestationCount)
+        {
+            case 0:
+                anim.SetTrigger("makeNormal");
+                break;
+            case 1:
+                anim.SetTrigger("makeWarning");
+                break;
+            case 2:
+                anim.SetTrigger("makeAwake");
+                break;
+        }
     }
 
 }

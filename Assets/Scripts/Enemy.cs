@@ -13,6 +13,8 @@ public class Enemy : MonoBehaviour {
     public string zone;
     public Enemy.Type type;
 
+    private Vector2 _movement;
+    
     public enum Type
     {
         BEE, LADYBUG, MAX
@@ -29,7 +31,6 @@ public class Enemy : MonoBehaviour {
     {
         if (isTrapped)
         {
-            /*
             float x = radius * Mathf.Sin(angle) + pivot.x;
             float y = radius * Mathf.Cos(angle) + pivot.y;
             Vector3 position = new Vector3(x, y, transform.position.z);
@@ -39,12 +40,11 @@ public class Enemy : MonoBehaviour {
             transform.right = position;
 
             angle += Time.deltaTime;
-            */
         } else
         {
-            transform.Translate(movement * new Vector3(0, -1, 0) * Time.deltaTime);
+            transform.Translate(movement * (512/100) * new Vector3(0, -1, 0) * Time.deltaTime);
         }
-	}
+    }
 
     // Returns true if the enemy is killed on this hit
     public bool Swat()
@@ -52,4 +52,5 @@ public class Enemy : MonoBehaviour {
         hitsLeft--;
         return hitsLeft <= 0;
     }
+
 }

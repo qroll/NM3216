@@ -1,17 +1,23 @@
 fileFormatVersion: 2
-guid: a6cd5a17024cbff418f725850e7f1bdd
-timeCreated: 1508045808
+guid: 4717890404c2def4ba4d1e855aa12490
+timeCreated: 1508431986
 licenseType: Free
 TextureImporter:
   fileIDToRecycleName:
-    21300000: frog-front_0
-    21300002: frog-front_1
-    21300004: frog-front_2
-    21300006: frog-front_3
-    21300008: frog-front_4
-    21300010: frog-front_5
-    21300012: frog-front_6
-    21300014: frog-front_7
+    21300000: babyfrog_0
+    21300002: babyfrog_1
+    21300004: babyfrog_2
+    21300006: babyfrog_3
+    21300008: babyfrog_4
+    21300010: babyfrog_5
+    21300012: babyfrog_6
+    21300014: babyfrog_7
+    21300016: babyfrog_8
+    21300018: babyfrog_9
+    21300020: babyfrog_10
+    21300022: babyfrog_11
+    21300024: babyfrog_12
+    21300026: babyfrog_13
   serializedVersion: 4
   mipmaps:
     mipMapMode: 0
@@ -38,7 +44,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: -1
+    filterMode: 0
     aniso: -1
     mipBias: -1
     wrapU: 1
@@ -53,7 +59,7 @@ TextureImporter:
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
-  spritePixelsToUnits: 100
+  spritePixelsToUnits: 256
   alphaUsage: 1
   alphaIsTransparency: 1
   spriteTessellationDetail: -1
@@ -83,7 +89,63 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: frog-front_0
+      name: babyfrog_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 3072
+        width: 1024
+        height: 1024
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: babyfrog_1
+      rect:
+        serializedVersion: 2
+        x: 1024
+        y: 3072
+        width: 1024
+        height: 1024
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: babyfrog_2
+      rect:
+        serializedVersion: 2
+        x: 2048
+        y: 3072
+        width: 1024
+        height: 1024
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: babyfrog_3
+      rect:
+        serializedVersion: 2
+        x: 3072
+        y: 3072
+        width: 1024
+        height: 1024
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: babyfrog_4
       rect:
         serializedVersion: 2
         x: 0
@@ -97,7 +159,7 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: frog-front_1
+      name: babyfrog_5
       rect:
         serializedVersion: 2
         x: 1024
@@ -111,7 +173,7 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: frog-front_2
+      name: babyfrog_6
       rect:
         serializedVersion: 2
         x: 2048
@@ -125,7 +187,21 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: frog-front_3
+      name: babyfrog_7
+      rect:
+        serializedVersion: 2
+        x: 3072
+        y: 2048
+        width: 1024
+        height: 1024
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: babyfrog_8
       rect:
         serializedVersion: 2
         x: 0
@@ -139,7 +215,7 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: frog-front_4
+      name: babyfrog_9
       rect:
         serializedVersion: 2
         x: 1024
@@ -153,7 +229,7 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: frog-front_5
+      name: babyfrog_10
       rect:
         serializedVersion: 2
         x: 2048
@@ -167,7 +243,21 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: frog-front_6
+      name: babyfrog_11
+      rect:
+        serializedVersion: 2
+        x: 3072
+        y: 1024
+        width: 1024
+        height: 1024
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: babyfrog_12
       rect:
         serializedVersion: 2
         x: 0
@@ -181,7 +271,7 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: frog-front_7
+      name: babyfrog_13
       rect:
         serializedVersion: 2
         x: 1024
