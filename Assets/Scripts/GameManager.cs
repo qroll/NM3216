@@ -35,15 +35,27 @@ public class GameManager : MonoBehaviour {
     [Tooltip("Max number of enemies")]
     public float maxSpawnNum = 1f;
 
-    public Transform enemyPrefab;
     public GameObject[] frogs;
     public GameObject babyFrog;
     public AudioSource audioSource;
     public AudioClip sound;
 
+    // Enemy prefabs
+    public Transform enemyPrefab;
+    public Transform flyEnemyPrefab;
+    public Transform beeEnemyPrefab;
+    public Transform ladybugEnemyPrefab;
+
+    public GameObject upZone;
+    public GameObject downZone;
+    public GameObject leftZone;
+    public GameObject rightZone;
+
     // Sprites
     public Sprite frogDisabledSprite;
     public Sprite frogEnabledSprite;
+    public Sprite plusSprite;
+    public Sprite flySprite;
     public Sprite beeSprite;
     public Sprite ladybugSprite;
 
@@ -82,23 +94,26 @@ public class GameManager : MonoBehaviour {
     // Initial values
     private static Dictionary<Enemy.Type, float> initialSpawnRatePerEnemy = new Dictionary<Enemy.Type, float>()
     {
-        { Enemy.Type.BEE, 3.0f },
+        { Enemy.Type.FLY, 3.0f },
+        { Enemy.Type.BEE, 5.0f },
         { Enemy.Type.LADYBUG, 5.0f }
     };
 
     private static Dictionary<Enemy.Type, float> initialSpawnNumPerEnemy = new Dictionary<Enemy.Type, float>()
     {
+        { Enemy.Type.FLY, 1.0f },
         { Enemy.Type.BEE, 1.0f },
         { Enemy.Type.LADYBUG, 1.0f }
     };
 
     private static Dictionary<Enemy.Type, float> initialLastIncreasedPerEnemy = new Dictionary<Enemy.Type, float>()
     {
+        { Enemy.Type.FLY, 0f },
         { Enemy.Type.BEE, 0f },
         { Enemy.Type.LADYBUG, 0f }
     };
 
-    private static Enemy.Type initialEnemyType = Enemy.Type.BEE;
+    private static Enemy.Type initialEnemyType = Enemy.Type.FLY;
 
     // Use this for initialization
     void Start()
@@ -151,12 +166,45 @@ public class GameManager : MonoBehaviour {
     void SpawnEnemy(Enemy.Type type)
     {
         string zone = GenerateZone();
-        Vector3 position = GeneratePosition(zone);
+        Vector3 position = GeneratePosition();
         Quaternion rotation = GenerateRotation(position);
 
         CDebug.Log(CDebug.EDebugLevel.DEBUG, string.Format("spawn position={0} | rotation={1} | time={2}", position, rotation, Time.time));
+        GameObject enemy;
+        switch (type)
+        {
+            case Enemy.Type.FLY:
+                enemy = Instantiate(flyEnemyPrefab).gameObject;
+                break;
+            case Enemy.Type.BEE:
+                enemy = Instantiate(beeEnemyPrefab).gameObject;
+                break;
+            case Enemy.Type.LADYBUG:
+                enemy = Instantiate(ladybugEnemyPrefab).gameObject;
+                break;
+            default:
+                enemy = Instantiate(enemyPrefab).gameObject;
+                break;
+        }
+        
+        switch (zone)
+        {
+            case "Up":
+                enemy.transform.parent = upZone.transform;
+                break;
+            case "Down":
+                enemy.transform.parent = downZone.transform;
+                break;
+            case "Left":
+                enemy.transform.parent = leftZone.transform;
+                break;
+            case "Right":
+                enemy.transform.parent = rightZone.transform;
+                break;
+        }
 
-        GameObject enemy = Instantiate(enemyPrefab, position, rotation).gameObject;
+        enemy.transform.localPosition = position;
+        enemy.transform.localRotation = rotation;
 
         // populate with zone tag
         GameObject zoneInfo = new GameObject("Zone");
@@ -168,13 +216,17 @@ public class GameManager : MonoBehaviour {
         enemyScript.zone = zone;
         enemyScript.type = type;
 
-        if (type == Enemy.Type.BEE)
+        if (type == Enemy.Type.FLY)
         {
-            // default values
-        } else if (type == Enemy.Type.LADYBUG)
+            ((FlyEnemy) enemyScript).m_centerPosition = position;
+        }
+        else if(type == Enemy.Type.BEE)
         {
-            enemyScript.movement = 1.5f;
-            enemy.GetComponent<SpriteRenderer>().sprite = ladybugSprite;
+            
+        }
+        else if (type == Enemy.Type.LADYBUG)
+        {
+            enemyScript.AddSprite(plusSprite);
         }
     }
 
@@ -193,23 +245,12 @@ public class GameManager : MonoBehaviour {
         }
     }
 
-    // Returns a spawning position at the edge of the screen within the specified zone
-    Vector3 GeneratePosition(string zone) {
+    // Returns a spawning position at the edge of the screen
+    Vector3 GeneratePosition() {
         Vector3 position;
 
-        if (zone == ZONE_UP)
-        {
-            position = Camera.main.ViewportToWorldPoint(new Vector3(Random.Range(0.5f, AXIS_MAX), 1, distFromCamera));
-        } else if (zone == ZONE_DOWN)
-        {
-            position = Camera.main.ViewportToWorldPoint(new Vector3(Random.Range(AXIS_MIN, 0.5f), 0, distFromCamera));
-        } else if (zone == ZONE_LEFT)
-        {
-            position = Camera.main.ViewportToWorldPoint(new Vector3(0.25f, Random.Range(0.5f, AXIS_MAX), distFromCamera));
-        } else
-        {
-            position = Camera.main.ViewportToWorldPoint(new Vector3(0.75f, Random.Range(AXIS_MIN, 0.5f), distFromCamera));
-        }
+        position = Camera.main.ViewportToWorldPoint(new Vector3(0.5f, 1.0f, distFromCamera));
+        position = new Vector3(Random.Range(-position.y, position.y), position.y, position.z);
 
         return position;
     }
@@ -228,14 +269,27 @@ public class GameManager : MonoBehaviour {
     // enemy closest to the player in the specified zone
     public void Swat(string zone)
     {
+        if (isGameOver)
+        {
+            return;
+        }
         CDebug.Log(CDebug.EDebugLevel.INFO, zone);
         
         // prioritize enemies in the infestation zone
         if (infestationZones[zone].Count > 0)
         {
-            GameObject enemy = infestationZones[zone].Dequeue();
-            UpdateInfestationCount(infestationCount - 1);
-            EatAndDestroyEnemy(zone, enemy);
+            GameObject enemy = infestationZones[zone].Peek();
+            if (enemy.GetComponent<Enemy>().Swat())
+            {
+                infestationZones[zone].Dequeue();
+                UpdateInfestationCount(infestationCount - 1);
+                EatAndDestroyEnemy(zone, enemy);
+                EnemySwatted(enemy);
+            }
+            else
+            {
+                EatEnemy(zone, enemy);
+            }
             return;
         }
 
@@ -338,7 +392,7 @@ public class GameManager : MonoBehaviour {
     
     IEnumerator ResetFrog(string zone)
     {
-        yield return new WaitForSeconds(0.2f);
+        yield return new WaitForSeconds(0.1f);
         GameObject frog = frogInZone[zone];
         Transform tongueLength = frog.transform.Find("tongue").Find("tongue-length");
 
@@ -398,6 +452,7 @@ public class GameManager : MonoBehaviour {
         {
             successCount = 0;
             highestEnemyType++;
+
             CDebug.Log(CDebug.EDebugLevel.TRACE, string.Format("Unlocked enemy={0}", highestEnemyType));
         }
     }
@@ -418,6 +473,7 @@ public class GameManager : MonoBehaviour {
         {
             CDebug.Log(CDebug.EDebugLevel.INFO, "game over");
             isGameOver = true;
+            Time.timeScale = 0.0f;
             inGameUI.SetActive(false);
             endGameUI.SetActive(true);
         }
