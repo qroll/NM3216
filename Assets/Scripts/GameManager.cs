@@ -13,10 +13,10 @@ public class GameManager : MonoBehaviour {
     [Tooltip("Radius of swat zone")]
     public float swatRadius = 1.0f;
     [Tooltip("Number of kills to next increase in success")]
-    public int nextKillCount = 3;
+    public int nextKillCount = 5;
     [Tooltip("Number of successes to next increase in difficulty")]
-    public int nextSuccessCount = 3;
-    [Tooltip("Max number of enemies in each zone before game over")]
+    public int nextSuccessCount = 5;
+    [Tooltip("Max number of enemies before game over")]
     public int maxNumEnemies = 3;
     [Tooltip("Duration of stun (seconds)")]
     public float stunTime = 1.0f;
@@ -60,6 +60,7 @@ public class GameManager : MonoBehaviour {
     public Sprite ladybugSprite;
 
     // UI elements
+    public GameObject keys;
     public GameObject info;
     public GameObject inGameUI;
     public GameObject pauseGameUI;
@@ -113,6 +114,13 @@ public class GameManager : MonoBehaviour {
         { Enemy.Type.LADYBUG, 0f }
     };
 
+    private static Dictionary<Enemy.Type, System.Func<int, float>> spawnRateFormula = new Dictionary<Enemy.Type, System.Func<int, float>>()
+    {
+        { Enemy.Type.FLY, x => 3 / Mathf.Pow(Mathf.Pow(3 / 1, 5), x) },
+        { Enemy.Type.BEE, x => 5 / Mathf.Pow(Mathf.Pow(5 / 1, 5), x) },
+        { Enemy.Type.LADYBUG, x => 5 / Mathf.Pow(Mathf.Pow(5 / 1, 5), x) }
+    };
+
     private static Enemy.Type initialEnemyType = Enemy.Type.FLY;
 
     // Use this for initialization
@@ -133,6 +141,14 @@ public class GameManager : MonoBehaviour {
         frogInZone.Add("Right", frogs[3]);
 
         ResetGame();
+
+        StartCoroutine(DisableKeys());
+    }
+
+    IEnumerator DisableKeys()
+    {
+        yield return new WaitForSeconds(8.0f);
+        keys.SetActive(false);
     }
 	
 	// Update is called once per frame
@@ -439,13 +455,14 @@ public class GameManager : MonoBehaviour {
         if (type == highestEnemyType)
         {
             killCount++;
-            currSpawnRatePerEnemy[type] = Mathf.Max(currSpawnRatePerEnemy[type] - deltaSpawnRate, initialMinSpawnRate);
             CDebug.Log(CDebug.EDebugLevel.TRACE, string.Format("Increased kill count={0}", killCount));
         }
         if (killCount == nextKillCount)
         {
             killCount = 0;
             successCount++;
+            // currSpawnRatePerEnemy[type] = Mathf.Max(currSpawnRatePerEnemy[type] - deltaSpawnRate, initialMinSpawnRate);
+            currSpawnRatePerEnemy[type] = Mathf.Max(spawnRateFormula[type](successCount), initialMinSpawnRate);
             CDebug.Log(CDebug.EDebugLevel.TRACE, string.Format("Increased success count={0}", successCount));
         }
         if (successCount == nextSuccessCount && highestEnemyType < Enemy.Type.MAX)
