@@ -3356,9 +3356,9 @@ MonoBehaviour:
   nextSuccessCount: 1
   maxNumEnemies: 3
   stunTime: 1
-  deltaSpawnRate: 1
+  deltaSpawnRate: 0.05
   initialMinSpawnRate: 1
-  minSpawnRate: 0.05
+  minSpawnRate: 0.1
   deltaSpawnNum: 0.25
   maxSpawnNum: 1
   frogs:
@@ -3387,6 +3387,7 @@ MonoBehaviour:
   flySprite: {fileID: 21300000, guid: fcb2ce12d016d054ca29ea7365e7473d, type: 3}
   beeSprite: {fileID: 21300000, guid: 5ae59af692c2be44cb2f380762932c4e, type: 3}
   ladybugSprite: {fileID: 21300000, guid: ede2cb582233e7149b89f0c342605924, type: 3}
+  info: {fileID: 223527867}
   inGameUI: {fileID: 299961524}
   pauseGameUI: {fileID: 1019002069}
   endGameUI: {fileID: 1776214778}

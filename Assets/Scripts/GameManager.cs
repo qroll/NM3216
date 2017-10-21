@@ -60,6 +60,7 @@ public class GameManager : MonoBehaviour {
     public Sprite ladybugSprite;
 
     // UI elements
+    public GameObject info;
     public GameObject inGameUI;
     public GameObject pauseGameUI;
     public GameObject endGameUI;
@@ -70,8 +71,7 @@ public class GameManager : MonoBehaviour {
     public const string ZONE_RIGHT = "Right";
 
     private static string[] ZONE_AXES = { "Vertical", "Horizontal" };
-    private static float AXIS_MIN = 0.3f;
-    private static float AXIS_MAX = 0.7f;
+    private static float AXIS_RANGE = 0.9f;
 
     // Game status
     private bool isGameOver = false;
@@ -250,7 +250,7 @@ public class GameManager : MonoBehaviour {
         Vector3 position;
 
         position = Camera.main.ViewportToWorldPoint(new Vector3(0.5f, 1.0f, distFromCamera));
-        position = new Vector3(Random.Range(-position.y, position.y), position.y, position.z);
+        position = new Vector3(Random.Range(AXIS_RANGE * -position.y, AXIS_RANGE * position.y), position.y, position.z);
 
         return position;
     }
@@ -428,10 +428,10 @@ public class GameManager : MonoBehaviour {
             {
                 newSpawnRatePerEnemy[entry.Key] = Mathf.Max(currSpawnRatePerEnemy[entry.Key] - deltaSpawnRate, minSpawnRate);
                 newSpawnNumPerEnemy[entry.Key] = Mathf.Min(currSpawnNumPerEnemy[entry.Key] + deltaSpawnNum, maxSpawnNum);
+                CDebug.Log(CDebug.EDebugLevel.TRACE, string.Format("Increased spawn rate={0} | spawn num={1}", newSpawnRatePerEnemy[entry.Key], newSpawnNumPerEnemy[entry.Key]));
             }
             currSpawnRatePerEnemy = newSpawnRatePerEnemy;
             currSpawnNumPerEnemy = newSpawnNumPerEnemy;
-            CDebug.Log(CDebug.EDebugLevel.TRACE, string.Format("Increased spawn rate={0} | number={1}", currSpawnRatePerEnemy.Values.ToString(), currSpawnNumPerEnemy.Values.ToString()));
             return;
         }
 
@@ -452,11 +452,22 @@ public class GameManager : MonoBehaviour {
         {
             successCount = 0;
             highestEnemyType++;
+            if (highestEnemyType < Enemy.Type.MAX)
+            {
+                info.SetActive(true);
+                StartCoroutine(ClearWaveWarning());
+            }
 
             CDebug.Log(CDebug.EDebugLevel.TRACE, string.Format("Unlocked enemy={0}", highestEnemyType));
         }
     }
-    
+
+    IEnumerator ClearWaveWarning()
+    {
+        yield return new WaitForSeconds(1.0f);
+        info.SetActive(false);
+    }
+
     // Inform GameManager that an enemy has reached the infestation zone
     public void EnemyReached(GameObject obj)
     {
@@ -472,10 +483,16 @@ public class GameManager : MonoBehaviour {
         if (infestationCount >= maxNumEnemies)
         {
             CDebug.Log(CDebug.EDebugLevel.INFO, "game over");
-            isGameOver = true;
-            Time.timeScale = 0.0f;
             inGameUI.SetActive(false);
             endGameUI.SetActive(true);
+            isGameOver = true;
+
+            GameObject[] gos = GameObject.FindGameObjectsWithTag("Enemy");
+            for (int i=0; i < gos.Length; i++)
+            {
+                Enemy script = (Enemy) gos[i].GetComponent("Enemy");
+                script.movement = 0;
+            }
         }
     }
 
@@ -506,13 +523,6 @@ public class GameManager : MonoBehaviour {
         pauseGameUI.SetActive(false);
         endGameUI.SetActive(false);
 
-        // enable all frogs
-        isFrogEnabledInZone.Clear();
-        isFrogEnabledInZone.Add("Up", true);
-        isFrogEnabledInZone.Add("Down", true);
-        isFrogEnabledInZone.Add("Left", true);
-        isFrogEnabledInZone.Add("Right", true);
-
         // reset frog sprites to normal state
         foreach (GameObject sprite in frogInZone.Values)
         {
@@ -532,6 +542,13 @@ public class GameManager : MonoBehaviour {
         successCount = 0;
         infestationCount = 0;
 
+        // enable all frogs
+        isFrogEnabledInZone.Clear();
+        isFrogEnabledInZone.Add("Up", true);
+        isFrogEnabledInZone.Add("Down", true);
+        isFrogEnabledInZone.Add("Left", true);
+        isFrogEnabledInZone.Add("Right", true);
+
         infestationZones.Clear();
         infestationZones.Add("Up", new Queue<GameObject>());
         infestationZones.Add("Down", new Queue<GameObject>());
@@ -544,6 +561,7 @@ public class GameManager : MonoBehaviour {
         highestEnemyType = initialEnemyType;
 
         UpdateInfestationCount(0);
+        Time.timeScale = 1.0f;
     }
 
     void UpdateInfestationCount(int count)

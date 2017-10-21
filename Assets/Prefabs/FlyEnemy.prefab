@@ -23,6 +23,7 @@ GameObject:
   - component: {fileID: 50372235823403658}
   - component: {fileID: 58715743993564668}
   - component: {fileID: 114074629884354152}
+  - component: {fileID: 95675971184144056}
   m_Layer: 0
   m_Name: FlyEnemy
   m_TagString: Enemy
@@ -78,6 +79,23 @@ CircleCollider2D:
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
   m_Radius: 0.58
+--- !u!95 &95675971184144056
+Animator:
+  serializedVersion: 3
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1967587686203930}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 02fd7d20eb16b16479465ea347ed6a46, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
 --- !u!114 &114074629884354152
 MonoBehaviour:
   m_ObjectHideFlags: 1
