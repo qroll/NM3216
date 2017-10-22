@@ -116,9 +116,9 @@ public class GameManager : MonoBehaviour {
 
     private static Dictionary<Enemy.Type, System.Func<int, float>> spawnRateFormula = new Dictionary<Enemy.Type, System.Func<int, float>>()
     {
-        { Enemy.Type.FLY, x => 3 / Mathf.Pow(Mathf.Pow(3 / 1, 5), x) },
-        { Enemy.Type.BEE, x => 5 / Mathf.Pow(Mathf.Pow(5 / 1, 5), x) },
-        { Enemy.Type.LADYBUG, x => 5 / Mathf.Pow(Mathf.Pow(5 / 1, 5), x) }
+        { Enemy.Type.FLY, x => 3 / Mathf.Pow(Mathf.Pow(3, 1 / 5.0f), x) },
+        { Enemy.Type.BEE, x => 5 / Mathf.Pow(Mathf.Pow(5, 1 / 5.0f), x) },
+        { Enemy.Type.LADYBUG, x => 5 / Mathf.Pow(Mathf.Pow(5 / 1, 1 / 5.0f), x) }
     };
 
     private static Enemy.Type initialEnemyType = Enemy.Type.FLY;
@@ -131,10 +131,10 @@ public class GameManager : MonoBehaviour {
         Camera.main.orthographicSize = s_baseOrthographicSize;
         */
 
+        CDebug.SetDebugLoggingLevel((int)debugLevel);
+
         anim = babyFrog.GetComponent<Animator>();
 
-        CDebug.SetDebugLoggingLevel((int) debugLevel);
-        
         frogInZone.Add("Up", frogs[0]);
         frogInZone.Add("Down", frogs[1]);
         frogInZone.Add("Left", frogs[2]);
@@ -289,7 +289,7 @@ public class GameManager : MonoBehaviour {
         {
             return;
         }
-        CDebug.Log(CDebug.EDebugLevel.INFO, zone);
+        CDebug.Log(CDebug.EDebugLevel.INFO, string.Format("swat in {0} zone", zone));
         
         // prioritize enemies in the infestation zone
         if (infestationZones[zone].Count > 0)
@@ -331,6 +331,8 @@ public class GameManager : MonoBehaviour {
             SpriteRenderer sr = frogInZone[zone].GetComponent<SpriteRenderer>();
             sr.sprite = frogDisabledSprite;
             StartCoroutine(EnableSwatter(stunTime, zone));
+            // reset the kill count on a missed hit
+            killCount = 0;
         }
     }
 
@@ -463,7 +465,7 @@ public class GameManager : MonoBehaviour {
             successCount++;
             // currSpawnRatePerEnemy[type] = Mathf.Max(currSpawnRatePerEnemy[type] - deltaSpawnRate, initialMinSpawnRate);
             currSpawnRatePerEnemy[type] = Mathf.Max(spawnRateFormula[type](successCount), initialMinSpawnRate);
-            CDebug.Log(CDebug.EDebugLevel.TRACE, string.Format("Increased success count={0}", successCount));
+            CDebug.Log(CDebug.EDebugLevel.TRACE, string.Format("Increased success count={0} | spawn rate={1}", successCount, currSpawnRatePerEnemy[type]));
         }
         if (successCount == nextSuccessCount && highestEnemyType < Enemy.Type.MAX)
         {
@@ -471,6 +473,7 @@ public class GameManager : MonoBehaviour {
             highestEnemyType++;
             if (highestEnemyType < Enemy.Type.MAX)
             {
+                lastIncreasedPerEnemy[highestEnemyType] = Time.time;
                 info.SetActive(true);
                 StartCoroutine(ClearWaveWarning());
             }
@@ -481,7 +484,7 @@ public class GameManager : MonoBehaviour {
 
     IEnumerator ClearWaveWarning()
     {
-        yield return new WaitForSeconds(1.0f);
+        yield return new WaitForSeconds(1.5f);
         info.SetActive(false);
     }
 
