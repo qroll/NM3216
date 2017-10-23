@@ -440,16 +440,26 @@ public class GameManager : MonoBehaviour {
     {
         if (highestEnemyType == Enemy.Type.MAX)
         {
-            Dictionary<Enemy.Type, float> newSpawnRatePerEnemy = new Dictionary<Enemy.Type, float>();
-            Dictionary<Enemy.Type, float> newSpawnNumPerEnemy = new Dictionary<Enemy.Type, float>();
-            foreach (KeyValuePair<Enemy.Type, float> entry in currSpawnRatePerEnemy)
+            killCount++;
+            if (killCount == nextKillCount)
             {
-                newSpawnRatePerEnemy[entry.Key] = Mathf.Max(currSpawnRatePerEnemy[entry.Key] - deltaSpawnRate, minSpawnRate);
-                newSpawnNumPerEnemy[entry.Key] = Mathf.Min(currSpawnNumPerEnemy[entry.Key] + deltaSpawnNum, maxSpawnNum);
-                CDebug.Log(CDebug.EDebugLevel.TRACE, string.Format("Increased spawn rate={0} | spawn num={1}", newSpawnRatePerEnemy[entry.Key], newSpawnNumPerEnemy[entry.Key]));
+                killCount = 0;
+                successCount++;
             }
-            currSpawnRatePerEnemy = newSpawnRatePerEnemy;
-            currSpawnNumPerEnemy = newSpawnNumPerEnemy;
+            if (successCount == nextSuccessCount)
+            {
+                successCount = 0;
+                Dictionary<Enemy.Type, float> newSpawnRatePerEnemy = new Dictionary<Enemy.Type, float>();
+                Dictionary<Enemy.Type, float> newSpawnNumPerEnemy = new Dictionary<Enemy.Type, float>();
+                foreach (KeyValuePair<Enemy.Type, float> entry in currSpawnRatePerEnemy)
+                {
+                    newSpawnRatePerEnemy[entry.Key] = Mathf.Max(currSpawnRatePerEnemy[entry.Key] - deltaSpawnRate, minSpawnRate);
+                    newSpawnNumPerEnemy[entry.Key] = Mathf.Min(currSpawnNumPerEnemy[entry.Key] + deltaSpawnNum, maxSpawnNum);
+                    CDebug.Log(CDebug.EDebugLevel.TRACE, string.Format("Increased spawn rate={0} | spawn num={1}", newSpawnRatePerEnemy[entry.Key], newSpawnNumPerEnemy[entry.Key]));
+                }
+                currSpawnRatePerEnemy = newSpawnRatePerEnemy;
+                currSpawnNumPerEnemy = newSpawnNumPerEnemy;
+            }
             return;
         }
 
