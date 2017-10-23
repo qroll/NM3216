@@ -76,6 +76,8 @@ public class GameManager : MonoBehaviour {
 
     // Game status
     private bool isGameOver = false;
+    private bool firstKill = true;
+    private float lastSuccessDelta = 0;
     private int killCount = 0;
     private int successCount = 0;
     private int infestationCount = 0;
@@ -157,6 +159,17 @@ public class GameManager : MonoBehaviour {
         if (isGameOver)
         {
             return;
+        }
+
+        float deltaTime = Time.deltaTime;
+        if (!firstKill && lastSuccessDelta + deltaTime > 5.0f)
+        {
+            lastSuccessDelta = 0;
+            IncreaseDifficulty();
+        }
+        else if (!firstKill)
+        {
+            lastSuccessDelta += deltaTime;
         }
 
         float currTime = Time.time;
@@ -290,6 +303,12 @@ public class GameManager : MonoBehaviour {
             return;
         }
         CDebug.Log(CDebug.EDebugLevel.INFO, string.Format("swat in {0} zone", zone));
+
+        if (firstKill)
+        {
+            keys.SetActive(false);
+            firstKill = false;
+        }
         
         // prioritize enemies in the infestation zone
         if (infestationZones[zone].Count > 0)
@@ -300,7 +319,7 @@ public class GameManager : MonoBehaviour {
                 infestationZones[zone].Dequeue();
                 UpdateInfestationCount(infestationCount - 1);
                 EatAndDestroyEnemy(zone, enemy);
-                EnemySwatted(enemy);
+                //EnemySwatted(enemy);
             }
             else
             {
@@ -319,7 +338,7 @@ public class GameManager : MonoBehaviour {
             if (closest.GetComponent<Enemy>().Swat())
             {
                 EatAndDestroyEnemy(zone, closest);
-                EnemySwatted(closest);
+                //EnemySwatted(closest);
             } else
             {
                 EatEnemy(zone, closest);
@@ -333,6 +352,7 @@ public class GameManager : MonoBehaviour {
             StartCoroutine(EnableSwatter(stunTime, zone));
             // reset the kill count on a missed hit
             killCount = 0;
+            lastSuccessDelta = 0;
         }
     }
 
@@ -432,6 +452,43 @@ public class GameManager : MonoBehaviour {
             case "Right":
                 frog.transform.right = Vector3.up;
                 break;
+        }
+    }
+
+    public void IncreaseDifficulty()
+    {
+        if (highestEnemyType == Enemy.Type.MAX)
+        {
+            Dictionary<Enemy.Type, float> newSpawnRatePerEnemy = new Dictionary<Enemy.Type, float>();
+            Dictionary<Enemy.Type, float> newSpawnNumPerEnemy = new Dictionary<Enemy.Type, float>();
+            foreach (KeyValuePair<Enemy.Type, float> entry in currSpawnRatePerEnemy)
+            {
+                newSpawnRatePerEnemy[entry.Key] = Mathf.Max(currSpawnRatePerEnemy[entry.Key] - deltaSpawnRate, minSpawnRate);
+                newSpawnNumPerEnemy[entry.Key] = Mathf.Min(currSpawnNumPerEnemy[entry.Key] + deltaSpawnNum, maxSpawnNum);
+                CDebug.Log(CDebug.EDebugLevel.TRACE, string.Format("Increased spawn rate={0} | spawn num={1}", newSpawnRatePerEnemy[entry.Key], newSpawnNumPerEnemy[entry.Key]));
+            }
+            currSpawnRatePerEnemy = newSpawnRatePerEnemy;
+            currSpawnNumPerEnemy = newSpawnNumPerEnemy;
+            return;
+        }
+        else
+        {
+            successCount++;
+            currSpawnRatePerEnemy[highestEnemyType] = Mathf.Max(spawnRateFormula[highestEnemyType](successCount), initialMinSpawnRate);
+            CDebug.Log(CDebug.EDebugLevel.TRACE, string.Format("Increased success count={0} | spawn rate={1}", successCount, currSpawnRatePerEnemy[highestEnemyType]));
+            if (successCount == nextSuccessCount && highestEnemyType < Enemy.Type.MAX)
+            {
+                successCount = 0;
+                highestEnemyType++;
+                if (highestEnemyType < Enemy.Type.MAX)
+                {
+                    lastIncreasedPerEnemy[highestEnemyType] = Time.time;
+                    info.SetActive(true);
+                    StartCoroutine(ClearWaveWarning());
+                }
+
+                CDebug.Log(CDebug.EDebugLevel.TRACE, string.Format("Unlocked enemy={0}", highestEnemyType));
+            }
         }
     }
 
@@ -558,6 +615,8 @@ public class GameManager : MonoBehaviour {
 
         // reset game state
         isGameOver = false;
+        firstKill = true;
+        lastSuccessDelta = 0;
         killCount = 0;
         successCount = 0;
         infestationCount = 0;
