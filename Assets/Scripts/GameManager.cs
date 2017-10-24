@@ -84,6 +84,22 @@ public class GameManager : MonoBehaviour {
     private Dictionary<string, GameObject> frogInZone = new Dictionary<string, GameObject>();
 
     private Dictionary<string, Queue<GameObject>> infestationZones = new Dictionary<string, Queue<GameObject>>();
+
+    private Dictionary<string, bool> isFrogSlowed = new Dictionary<string, bool>()
+    {
+        { "Up", false },
+        { "Down", false },
+        { "Left", false },
+        { "Right", false }
+    };
+
+    private Dictionary<string, float> nextAllowedHit = new Dictionary<string, float>()
+    {
+        { "Up", 0 },
+        { "Down", 0 },
+        { "Left", 0 },
+        { "Right", 0 }
+    };
     
     // Spawn rates per enemy during the game
     private Dictionary<Enemy.Type, float> currSpawnRatePerEnemy;
@@ -293,12 +309,20 @@ public class GameManager : MonoBehaviour {
     // enemy closest to the player in the specified zone
     public void Swat(string zone)
     {
-        if (isGameOver)
+        bool isSwatterActive = isFrogEnabledInZone[zone];
+
+        if (isGameOver || !isSwatterActive)
         {
             return;
         }
         CDebug.Log(CDebug.EDebugLevel.INFO, string.Format("swat in {0} zone", zone));
-        
+        if (isFrogSlowed[zone] && Time.time < nextAllowedHit[zone])
+        {
+            return;
+        }
+
+        nextAllowedHit[zone] += 0.5f;
+
         // prioritize enemies in the infestation zone
         if (infestationZones[zone].Count > 0)
         {
@@ -318,7 +342,6 @@ public class GameManager : MonoBehaviour {
         }
 
         GameObject closest = FindClosestEnemy(zone);
-        bool isSwatterActive = isFrogEnabledInZone[zone];
 
         if (isSwatterActive && closest != null)
         {
@@ -506,21 +529,31 @@ public class GameManager : MonoBehaviour {
         info.SetActive(false);
     }
 
+    IEnumerator DisableWeb(string zone)
+    {
+        yield return new WaitForSeconds(3f);
+        isFrogSlowed[zone] = false;
+    }
+
     // Inform GameManager that an enemy has reached the infestation zone
     public void EnemyReached(GameObject obj)
     {
         Enemy control = (Enemy) obj.GetComponent("Enemy");
 
+        string zone = control.zone;
+
         if (control.type == Enemy.Type.WEB)
         {
             CDebug.Log(CDebug.EDebugLevel.DEBUG, "web reached");
+            isFrogSlowed[zone] = true;
+            nextAllowedHit[zone] = Time.time + 0.5f;
+            StartCoroutine(DisableWeb(zone));
             return;
         }
 
         control.angle = Mathf.Atan2(obj.transform.position.y, obj.transform.position.x);
         control.isTrapped = true;
 
-        string zone = control.zone;
         infestationZones[zone].Enqueue(obj);
         UpdateInfestationCount(infestationCount + 1);
         control.pivot = frogInZone[zone].transform.position;

@@ -34,6 +34,8 @@ public class SpiderEnemy : Enemy
         GameObject zoneInfo = new GameObject("Zone");
         zoneInfo.tag = "Zone" + zone;
         zoneInfo.transform.parent = webObj;
+        Enemy enemyScript = webObj.GetComponent<Enemy>();
+        enemyScript.zone = zone;
 
         webShot = true;
     }
