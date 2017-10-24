@@ -45,6 +45,7 @@ public class GameManager : MonoBehaviour {
     public Transform flyEnemyPrefab;
     public Transform beeEnemyPrefab;
     public Transform ladybugEnemyPrefab;
+    public Transform spiderEnemyPrefab;
 
     public GameObject upZone;
     public GameObject downZone;
@@ -97,31 +98,35 @@ public class GameManager : MonoBehaviour {
     {
         { Enemy.Type.FLY, 3.0f },
         { Enemy.Type.BEE, 5.0f },
-        { Enemy.Type.LADYBUG, 5.0f }
+        { Enemy.Type.LADYBUG, 5.0f },
+        { Enemy.Type.SPIDER, 5.0f }
     };
 
     private static Dictionary<Enemy.Type, float> initialSpawnNumPerEnemy = new Dictionary<Enemy.Type, float>()
     {
         { Enemy.Type.FLY, 1.0f },
         { Enemy.Type.BEE, 1.0f },
-        { Enemy.Type.LADYBUG, 1.0f }
+        { Enemy.Type.LADYBUG, 1.0f },
+        { Enemy.Type.SPIDER, 1.0f }
     };
 
     private static Dictionary<Enemy.Type, float> initialLastIncreasedPerEnemy = new Dictionary<Enemy.Type, float>()
     {
         { Enemy.Type.FLY, 0f },
         { Enemy.Type.BEE, 0f },
-        { Enemy.Type.LADYBUG, 0f }
+        { Enemy.Type.LADYBUG, 0f },
+        { Enemy.Type.SPIDER, 0f }
     };
 
     private static Dictionary<Enemy.Type, System.Func<int, float>> spawnRateFormula = new Dictionary<Enemy.Type, System.Func<int, float>>()
     {
         { Enemy.Type.FLY, x => 3 / Mathf.Pow(Mathf.Pow(3, 1 / 5.0f), x) },
         { Enemy.Type.BEE, x => 5 / Mathf.Pow(Mathf.Pow(5, 1 / 5.0f), x) },
-        { Enemy.Type.LADYBUG, x => 5 / Mathf.Pow(Mathf.Pow(5 / 1, 1 / 5.0f), x) }
+        { Enemy.Type.LADYBUG, x => 5 / Mathf.Pow(Mathf.Pow(5 / 1, 1 / 5.0f), x) },
+        { Enemy.Type.SPIDER, x => 5 / Mathf.Pow(Mathf.Pow(5 / 1, 1 / 5.0f), x) }
     };
 
-    private static Enemy.Type initialEnemyType = Enemy.Type.FLY;
+    private static Enemy.Type initialEnemyType = Enemy.Type.SPIDER;
 
     // Use this for initialization
     void Start()
@@ -197,6 +202,9 @@ public class GameManager : MonoBehaviour {
                 break;
             case Enemy.Type.LADYBUG:
                 enemy = Instantiate(ladybugEnemyPrefab).gameObject;
+                break;
+            case Enemy.Type.SPIDER:
+                enemy = Instantiate(spiderEnemyPrefab).gameObject;
                 break;
             default:
                 enemy = Instantiate(enemyPrefab).gameObject;
@@ -502,6 +510,13 @@ public class GameManager : MonoBehaviour {
     public void EnemyReached(GameObject obj)
     {
         Enemy control = (Enemy) obj.GetComponent("Enemy");
+
+        if (control.type == Enemy.Type.WEB)
+        {
+            CDebug.Log(CDebug.EDebugLevel.DEBUG, "web reached");
+            return;
+        }
+
         control.angle = Mathf.Atan2(obj.transform.position.y, obj.transform.position.x);
         control.isTrapped = true;
 

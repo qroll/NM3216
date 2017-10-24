@@ -20,7 +20,7 @@ public class Enemy : MonoBehaviour {
 
     public enum Type
     {
-        FLY, BEE, LADYBUG, MAX
+        FLY, BEE, LADYBUG, SPIDER, MAX, WEB
     }
 
     // Use this for initialization
@@ -30,7 +30,7 @@ public class Enemy : MonoBehaviour {
 	}
 	
 	// Update is called once per frame
-	void Update()
+	protected virtual void Update()
     {
         if (isTrapped)
         {

@@ -3676,6 +3676,8 @@ MonoBehaviour:
     type: 2}
   ladybugEnemyPrefab: {fileID: 4994900873364730, guid: 58257201e960eab4c8206066138adb69,
     type: 2}
+  spiderEnemyPrefab: {fileID: 4994900873364730, guid: 08400ce9069e60c42a1109acde2e1d3f,
+    type: 2}
   upZone: {fileID: 1101202673}
   downZone: {fileID: 8633230}
   leftZone: {fileID: 2100564658}
