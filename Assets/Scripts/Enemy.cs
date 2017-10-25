@@ -20,7 +20,7 @@ public class Enemy : MonoBehaviour {
 
     public enum Type
     {
-        FLY, BEE, LADYBUG, MAX
+        FLY, BEE, LADYBUG, FIREFLY, MAX
     }
 
     // Use this for initialization
@@ -61,7 +61,7 @@ public class Enemy : MonoBehaviour {
     }
 
     // Returns true if the enemy is killed on this hit
-    public bool Swat()
+    public virtual bool Swat()
     {
         hitsLeft--;
         if (hitsLeft == 1)
