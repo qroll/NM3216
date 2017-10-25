@@ -3680,6 +3680,12 @@ MonoBehaviour:
     type: 2}
   ladybugEnemyPrefab: {fileID: 4994900873364730, guid: 58257201e960eab4c8206066138adb69,
     type: 2}
+  fireflyEnemyPrefab: {fileID: 4994900873364730, guid: a16ff652353b58544a385d661f049dad,
+    type: 2}
+  upZone: {fileID: 1101202673}
+  downZone: {fileID: 8633230}
+  leftZone: {fileID: 2100564658}
+  rightZone: {fileID: 1737917428}
   frogDisabledSprite: {fileID: 21300000, guid: 589a7a1d7e3be6147b401ebc902b5108, type: 3}
   frogEnabledSprite: {fileID: 21300000, guid: 2235c656f801009438700ab45da4bce8, type: 3}
   plusSprite: {fileID: 21300000, guid: 2269c435ab5b65a4ab1088b80cb5c94f, type: 3}

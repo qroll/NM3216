@@ -20,6 +20,9 @@ public class GameManager : MonoBehaviour {
     public int maxNumEnemies = 3;
     [Tooltip("Duration of stun (seconds)")]
     public float stunTime = 1.0f;
+    [Tooltip("Starting unlocked enemies")]
+    public Enemy.Type initialEnemyType = Enemy.Type.FLY;
+
 
     // controls the frequency of spawning
     [Tooltip("Change in frequency on success")]
@@ -56,6 +59,7 @@ public class GameManager : MonoBehaviour {
     public Transform flyEnemyPrefab;
     public Transform beeEnemyPrefab;
     public Transform ladybugEnemyPrefab;
+    public Transform fireflyEnemyPrefab;
 
     // Sprites
     public Sprite frogDisabledSprite;
@@ -102,27 +106,28 @@ public class GameManager : MonoBehaviour {
     private Dictionary<Enemy.Type, float> lastIncreasedPerEnemy;
 
     // Initial values
-    private static Enemy.Type initialEnemyType = Enemy.Type.FLY;
-
     private static Dictionary<Enemy.Type, float> initialSpawnRatePerEnemy = new Dictionary<Enemy.Type, float>()
     {
         { Enemy.Type.FLY, 3.0f },
         { Enemy.Type.BEE, 5.0f },
-        { Enemy.Type.LADYBUG, 5.0f }
+        { Enemy.Type.LADYBUG, 5.0f },
+        { Enemy.Type.FIREFLY, 5.0f }
     };
 
     private static Dictionary<Enemy.Type, float> initialSpawnNumPerEnemy = new Dictionary<Enemy.Type, float>()
     {
         { Enemy.Type.FLY, 1.0f },
         { Enemy.Type.BEE, 1.0f },
-        { Enemy.Type.LADYBUG, 1.0f }
+        { Enemy.Type.LADYBUG, 1.0f },
+        { Enemy.Type.FIREFLY, 1.0f }
     };
-    
+
     private static Dictionary<Enemy.Type, System.Func<int, float>> spawnRateFormula = new Dictionary<Enemy.Type, System.Func<int, float>>()
     {
         { Enemy.Type.FLY, x => 3 / Mathf.Pow(Mathf.Pow(3, 1 / 5.0f), x) },
         { Enemy.Type.BEE, x => 5 / Mathf.Pow(Mathf.Pow(5, 1 / 5.0f), x) },
-        { Enemy.Type.LADYBUG, x => 5 / Mathf.Pow(Mathf.Pow(5 / 1, 1 / 5.0f), x) }
+        { Enemy.Type.LADYBUG, x => 5 / Mathf.Pow(Mathf.Pow(5 / 1, 1 / 5.0f), x) },
+        { Enemy.Type.FIREFLY, x => 5 / Mathf.Pow(Mathf.Pow(5 / 1, 1 / 5.0f), x) }
     };
 
     // Use this for initialization
@@ -282,6 +287,9 @@ public class GameManager : MonoBehaviour {
                 break;
             case Enemy.Type.LADYBUG:
                 enemy = Instantiate(ladybugEnemyPrefab).gameObject;
+                break;
+            case Enemy.Type.FIREFLY:
+                enemy = Instantiate(fireflyEnemyPrefab).gameObject;
                 break;
             default:
                 enemy = Instantiate(enemyPrefab).gameObject;
