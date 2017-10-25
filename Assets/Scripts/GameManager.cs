@@ -35,7 +35,18 @@ public class GameManager : MonoBehaviour {
     [Tooltip("Max number of enemies")]
     public float maxSpawnNum = 1f;
 
-    public GameObject[] frogs;
+    // Zone specific references
+    public GameObject upZone;
+    public GameObject downZone;
+    public GameObject leftZone;
+    public GameObject rightZone;
+
+    public GameObject upFrog;
+    public GameObject downFrog;
+    public GameObject leftFrog;
+    public GameObject rightFrog;
+    
+    // Player specific references
     public GameObject babyFrog;
     public AudioSource audioSource;
     public AudioClip sound;
@@ -46,22 +57,14 @@ public class GameManager : MonoBehaviour {
     public Transform beeEnemyPrefab;
     public Transform ladybugEnemyPrefab;
 
-    public GameObject upZone;
-    public GameObject downZone;
-    public GameObject leftZone;
-    public GameObject rightZone;
-
     // Sprites
     public Sprite frogDisabledSprite;
     public Sprite frogEnabledSprite;
     public Sprite plusSprite;
-    public Sprite flySprite;
-    public Sprite beeSprite;
-    public Sprite ladybugSprite;
 
     // UI elements
-    public GameObject keys;
-    public GameObject info;
+    public GameObject controlsOverlay;
+    public GameObject newEnemyWarning;
     public GameObject inGameUI;
     public GameObject pauseGameUI;
     public GameObject endGameUI;
@@ -71,30 +74,36 @@ public class GameManager : MonoBehaviour {
     public const string ZONE_LEFT = "Left";
     public const string ZONE_RIGHT = "Right";
 
+    // constants
     private static string[] ZONE_AXES = { "Vertical", "Horizontal" };
-    private static float AXIS_RANGE = 0.9f;
+    private const float AXIS_RANGE = 0.9f;
+    private const float SUCCESS_TIME = 5.0f;
+
+    // references to frequently accessed objects or components
+    private Dictionary<string, GameObject> frogInZone = new Dictionary<string, GameObject>();
+    private Animator babyFrogAnimator;
 
     // Game status
     private bool isGameOver = false;
     private bool firstKill = true;
-    private float lastSuccessDelta = 0;
+    private Dictionary<string, bool> isFrogEnabledInZone = new Dictionary<string, bool>();
+    private int infestationCount = 0;
+    private Dictionary<string, Queue<GameObject>> infestationZones = new Dictionary<string, Queue<GameObject>>();
+    private Enemy.Type currHighestEnemyType;
+
+    // Success tracking
+    private float lastSuccessTimeDelta = 0;
     private int killCount = 0;
     private int successCount = 0;
-    private int infestationCount = 0;
-    private Dictionary<string, bool> isFrogEnabledInZone = new Dictionary<string, bool>();
-    private Dictionary<string, GameObject> frogInZone = new Dictionary<string, GameObject>();
 
-    private Dictionary<string, Queue<GameObject>> infestationZones = new Dictionary<string, Queue<GameObject>>();
-    
     // Spawn rates per enemy during the game
     private Dictionary<Enemy.Type, float> currSpawnRatePerEnemy;
     private Dictionary<Enemy.Type, float> currSpawnNumPerEnemy;
     private Dictionary<Enemy.Type, float> lastIncreasedPerEnemy;
-    private Enemy.Type highestEnemyType;
-
-    private Animator anim;
 
     // Initial values
+    private static Enemy.Type initialEnemyType = Enemy.Type.FLY;
+
     private static Dictionary<Enemy.Type, float> initialSpawnRatePerEnemy = new Dictionary<Enemy.Type, float>()
     {
         { Enemy.Type.FLY, 3.0f },
@@ -108,14 +117,7 @@ public class GameManager : MonoBehaviour {
         { Enemy.Type.BEE, 1.0f },
         { Enemy.Type.LADYBUG, 1.0f }
     };
-
-    private static Dictionary<Enemy.Type, float> initialLastIncreasedPerEnemy = new Dictionary<Enemy.Type, float>()
-    {
-        { Enemy.Type.FLY, 0f },
-        { Enemy.Type.BEE, 0f },
-        { Enemy.Type.LADYBUG, 0f }
-    };
-
+    
     private static Dictionary<Enemy.Type, System.Func<int, float>> spawnRateFormula = new Dictionary<Enemy.Type, System.Func<int, float>>()
     {
         { Enemy.Type.FLY, x => 3 / Mathf.Pow(Mathf.Pow(3, 1 / 5.0f), x) },
@@ -123,34 +125,97 @@ public class GameManager : MonoBehaviour {
         { Enemy.Type.LADYBUG, x => 5 / Mathf.Pow(Mathf.Pow(5 / 1, 1 / 5.0f), x) }
     };
 
-    private static Enemy.Type initialEnemyType = Enemy.Type.FLY;
-
     // Use this for initialization
     void Start()
+    {
+        CDebug.SetDebugLoggingLevel((int)debugLevel);
+
+        FirstTimeSetUp();
+        ResetGame();
+
+        StartCoroutine(DisableControlsOverlay());
+    }
+
+    void FirstTimeSetUp()
     {
         /*
         float s_baseOrthographicSize = Screen.height / 32.0f / 2.0f;
         Camera.main.orthographicSize = s_baseOrthographicSize;
         */
 
-        CDebug.SetDebugLoggingLevel((int)debugLevel);
+        babyFrogAnimator = babyFrog.GetComponent<Animator>();
 
-        anim = babyFrog.GetComponent<Animator>();
-
-        frogInZone.Add("Up", frogs[0]);
-        frogInZone.Add("Down", frogs[1]);
-        frogInZone.Add("Left", frogs[2]);
-        frogInZone.Add("Right", frogs[3]);
-
-        ResetGame();
-
-        StartCoroutine(DisableKeys());
+        frogInZone.Add("Up", upFrog);
+        frogInZone.Add("Down", downFrog);
+        frogInZone.Add("Left", leftFrog);
+        frogInZone.Add("Right", rightFrog);
     }
 
-    IEnumerator DisableKeys()
+    void ResetGame()
     {
-        yield return new WaitForSeconds(8.0f);
-        keys.SetActive(false);
+        float currTime = Time.time;
+
+        // reset UI elements
+        inGameUI.SetActive(true);
+        pauseGameUI.SetActive(false);
+        endGameUI.SetActive(false);
+
+        // reset frog sprites to normal state
+        foreach (GameObject sprite in frogInZone.Values)
+        {
+            SpriteRenderer sr = sprite.GetComponent<SpriteRenderer>();
+            sr.sprite = frogEnabledSprite;
+        }
+        
+        // remove all remaining enemies
+        foreach (GameObject obj in GameObject.FindGameObjectsWithTag("Enemy"))
+        {
+            Object.Destroy(obj);
+        }
+
+        // reset game state
+        isGameOver = false;
+        firstKill = true;
+        
+        isFrogEnabledInZone.Clear();
+        isFrogEnabledInZone.Add("Up", true);
+        isFrogEnabledInZone.Add("Down", true);
+        isFrogEnabledInZone.Add("Left", true);
+        isFrogEnabledInZone.Add("Right", true);
+
+        currHighestEnemyType = initialEnemyType;
+
+        UpdateInfestationCount(0);
+
+        infestationZones.Clear();
+        infestationZones.Add("Up", new Queue<GameObject>());
+        infestationZones.Add("Down", new Queue<GameObject>());
+        infestationZones.Add("Left", new Queue<GameObject>());
+        infestationZones.Add("Right", new Queue<GameObject>());
+
+        lastSuccessTimeDelta = 0;
+        killCount = 0;
+        successCount = 0;
+        
+        currSpawnRatePerEnemy = new Dictionary<Enemy.Type, float>(initialSpawnRatePerEnemy);
+        currSpawnNumPerEnemy = new Dictionary<Enemy.Type, float>(initialSpawnNumPerEnemy);
+        lastIncreasedPerEnemy = new Dictionary<Enemy.Type, float>()
+        {
+            { Enemy.Type.FLY, currTime },
+            { Enemy.Type.BEE, currTime },
+            { Enemy.Type.LADYBUG, currTime }
+        };
+        
+        Time.timeScale = 1.0f;
+    }
+
+    IEnumerator DisableControlsOverlay()
+    {
+        while (firstKill)
+        {
+            yield return null;
+        }
+        controlsOverlay.SetActive(false);
     }
 	
 	// Update is called once per frame
@@ -161,31 +226,37 @@ public class GameManager : MonoBehaviour {
             return;
         }
 
+        float currTime = Time.time;
         float deltaTime = Time.deltaTime;
-        if (!firstKill && lastSuccessDelta + deltaTime > 5.0f)
+
+        if (!firstKill)
         {
-            lastSuccessDelta = 0;
-            IncreaseDifficulty();
-        }
-        else if (!firstKill)
-        {
-            lastSuccessDelta += deltaTime;
+            if (lastSuccessTimeDelta + deltaTime > SUCCESS_TIME)
+            {
+                lastSuccessTimeDelta = 0;
+                IncreaseDifficulty();
+            } else
+            {
+                lastSuccessTimeDelta += deltaTime;
+            }
         }
 
-        float currTime = Time.time;
         foreach (KeyValuePair<Enemy.Type, float> entry in currSpawnRatePerEnemy)
         {
-            if (entry.Key > highestEnemyType)
+            var type = entry.Key;
+            var spawnRate = entry.Value;
+
+            if (type > currHighestEnemyType || spawnRate <= 0)
             {
                 continue;
             }
 
-            if (currTime - (startDelay + lastIncreasedPerEnemy[entry.Key]) > entry.Value)
+            if (currTime - (startDelay + lastIncreasedPerEnemy[type]) > spawnRate)
             {
-                lastIncreasedPerEnemy[entry.Key] = currTime;
-                for (int i = 0; i < currSpawnNumPerEnemy[entry.Key]; i++)
+                lastIncreasedPerEnemy[type] = currTime;
+                for (int i = 0; i < currSpawnNumPerEnemy[type]; i++)
                 {
-                    SpawnEnemy(entry.Key);
+                    SpawnEnemy(type);
                 }
             }
         }
@@ -197,8 +268,9 @@ public class GameManager : MonoBehaviour {
         string zone = GenerateZone();
         Vector3 position = GeneratePosition();
         Quaternion rotation = GenerateRotation(position);
+        CDebug.Log(CDebug.EDebugLevel.DEBUG, string.Format("zone={0} | spawn position={1} | rotation={2} | time={3}", zone, position, rotation.eulerAngles, Time.time));
 
-        CDebug.Log(CDebug.EDebugLevel.DEBUG, string.Format("spawn position={0} | rotation={1} | time={2}", position, rotation, Time.time));
+        // Instantiate and position enemy prefab
         GameObject enemy;
         switch (type)
         {
@@ -243,19 +315,19 @@ public class GameManager : MonoBehaviour {
         // populate with enemy-specific info
         Enemy enemyScript = enemy.GetComponent<Enemy>();
         enemyScript.zone = zone;
-        enemyScript.type = type;
 
-        if (type == Enemy.Type.FLY)
+        switch (type)
         {
-            ((FlyEnemy) enemyScript).m_centerPosition = position;
-        }
-        else if(type == Enemy.Type.BEE)
-        {
-            
-        }
-        else if (type == Enemy.Type.LADYBUG)
-        {
-            enemyScript.AddSprite(plusSprite);
+            case Enemy.Type.FLY:
+                ((FlyEnemy)enemyScript).m_centerPosition = position;
+                break;
+            case Enemy.Type.BEE:
+                break;
+            case Enemy.Type.LADYBUG:
+                enemyScript.AddSprite(plusSprite);
+                break;
+            default:
+                break;
         }
     }
 
@@ -302,11 +374,11 @@ public class GameManager : MonoBehaviour {
         {
             return;
         }
+
         CDebug.Log(CDebug.EDebugLevel.INFO, string.Format("swat in {0} zone", zone));
 
         if (firstKill)
         {
-            keys.SetActive(false);
             firstKill = false;
         }
         
@@ -319,7 +391,7 @@ public class GameManager : MonoBehaviour {
                 infestationZones[zone].Dequeue();
                 UpdateInfestationCount(infestationCount - 1);
                 EatAndDestroyEnemy(zone, enemy);
-                //EnemySwatted(enemy);
+                // EnemySwatted(enemy);
             }
             else
             {
@@ -352,7 +424,7 @@ public class GameManager : MonoBehaviour {
             StartCoroutine(EnableSwatter(stunTime, zone));
             // reset the kill count on a missed hit
             killCount = 0;
-            lastSuccessDelta = 0;
+            lastSuccessTimeDelta = 0;
         }
     }
 
@@ -457,7 +529,7 @@ public class GameManager : MonoBehaviour {
 
     public void IncreaseDifficulty()
     {
-        if (highestEnemyType == Enemy.Type.MAX)
+        if (currHighestEnemyType == Enemy.Type.MAX)
         {
             Dictionary<Enemy.Type, float> newSpawnRatePerEnemy = new Dictionary<Enemy.Type, float>();
             Dictionary<Enemy.Type, float> newSpawnNumPerEnemy = new Dictionary<Enemy.Type, float>();
@@ -474,20 +546,20 @@ public class GameManager : MonoBehaviour {
         else
         {
             successCount++;
-            currSpawnRatePerEnemy[highestEnemyType] = Mathf.Max(spawnRateFormula[highestEnemyType](successCount), initialMinSpawnRate);
-            CDebug.Log(CDebug.EDebugLevel.TRACE, string.Format("Increased success count={0} | spawn rate={1}", successCount, currSpawnRatePerEnemy[highestEnemyType]));
-            if (successCount == nextSuccessCount && highestEnemyType < Enemy.Type.MAX)
+            currSpawnRatePerEnemy[currHighestEnemyType] = Mathf.Max(spawnRateFormula[currHighestEnemyType](successCount), initialMinSpawnRate);
+            CDebug.Log(CDebug.EDebugLevel.TRACE, string.Format("Increased success count={0} | spawn rate={1}", successCount, currSpawnRatePerEnemy[currHighestEnemyType]));
+            if (successCount == nextSuccessCount && currHighestEnemyType < Enemy.Type.MAX)
             {
                 successCount = 0;
-                highestEnemyType++;
-                if (highestEnemyType < Enemy.Type.MAX)
+                currHighestEnemyType++;
+                if (currHighestEnemyType < Enemy.Type.MAX)
                 {
-                    lastIncreasedPerEnemy[highestEnemyType] = Time.time;
-                    info.SetActive(true);
+                    lastIncreasedPerEnemy[currHighestEnemyType] = Time.time;
+                    newEnemyWarning.SetActive(true);
                     StartCoroutine(ClearWaveWarning());
                 }
 
-                CDebug.Log(CDebug.EDebugLevel.TRACE, string.Format("Unlocked enemy={0}", highestEnemyType));
+                CDebug.Log(CDebug.EDebugLevel.TRACE, string.Format("Unlocked enemy={0}", currHighestEnemyType));
             }
         }
     }
@@ -495,7 +567,7 @@ public class GameManager : MonoBehaviour {
     // Inform GameManager that an enemy has been successfully swatted
     public void EnemySwatted(GameObject enemy)
     {
-        if (highestEnemyType == Enemy.Type.MAX)
+        if (currHighestEnemyType == Enemy.Type.MAX)
         {
             killCount++;
             if (killCount == nextKillCount)
@@ -521,7 +593,7 @@ public class GameManager : MonoBehaviour {
         }
 
         Enemy.Type type = enemy.GetComponent<Enemy>().type;
-        if (type == highestEnemyType)
+        if (type == currHighestEnemyType)
         {
             killCount++;
             CDebug.Log(CDebug.EDebugLevel.TRACE, string.Format("Increased kill count={0}", killCount));
@@ -534,25 +606,25 @@ public class GameManager : MonoBehaviour {
             currSpawnRatePerEnemy[type] = Mathf.Max(spawnRateFormula[type](successCount), initialMinSpawnRate);
             CDebug.Log(CDebug.EDebugLevel.TRACE, string.Format("Increased success count={0} | spawn rate={1}", successCount, currSpawnRatePerEnemy[type]));
         }
-        if (successCount == nextSuccessCount && highestEnemyType < Enemy.Type.MAX)
+        if (successCount == nextSuccessCount && currHighestEnemyType < Enemy.Type.MAX)
         {
             successCount = 0;
-            highestEnemyType++;
-            if (highestEnemyType < Enemy.Type.MAX)
+            currHighestEnemyType++;
+            if (currHighestEnemyType < Enemy.Type.MAX)
             {
-                lastIncreasedPerEnemy[highestEnemyType] = Time.time;
-                info.SetActive(true);
+                lastIncreasedPerEnemy[currHighestEnemyType] = Time.time;
+                newEnemyWarning.SetActive(true);
                 StartCoroutine(ClearWaveWarning());
             }
 
-            CDebug.Log(CDebug.EDebugLevel.TRACE, string.Format("Unlocked enemy={0}", highestEnemyType));
+            CDebug.Log(CDebug.EDebugLevel.TRACE, string.Format("Unlocked enemy={0}", currHighestEnemyType));
         }
     }
 
     IEnumerator ClearWaveWarning()
     {
         yield return new WaitForSeconds(1.5f);
-        info.SetActive(false);
+        newEnemyWarning.SetActive(false);
     }
 
     // Inform GameManager that an enemy has reached the infestation zone
@@ -604,60 +676,11 @@ public class GameManager : MonoBehaviour {
         ResetGame();
     }
 
-    void ResetGame()
-    {
-        inGameUI.SetActive(true);
-        pauseGameUI.SetActive(false);
-        endGameUI.SetActive(false);
-
-        // reset frog sprites to normal state
-        foreach (GameObject sprite in frogInZone.Values)
-        {
-            SpriteRenderer sr = sprite.GetComponent<SpriteRenderer>();
-            sr.sprite = frogEnabledSprite;
-        }
-
-        // remove all remaining enemies
-        foreach (GameObject obj in GameObject.FindGameObjectsWithTag("Enemy"))
-        {
-            Object.Destroy(obj);
-        }
-
-        // reset game state
-        isGameOver = false;
-        firstKill = true;
-        lastSuccessDelta = 0;
-        killCount = 0;
-        successCount = 0;
-        infestationCount = 0;
-
-        // enable all frogs
-        isFrogEnabledInZone.Clear();
-        isFrogEnabledInZone.Add("Up", true);
-        isFrogEnabledInZone.Add("Down", true);
-        isFrogEnabledInZone.Add("Left", true);
-        isFrogEnabledInZone.Add("Right", true);
-
-        infestationZones.Clear();
-        infestationZones.Add("Up", new Queue<GameObject>());
-        infestationZones.Add("Down", new Queue<GameObject>());
-        infestationZones.Add("Left", new Queue<GameObject>());
-        infestationZones.Add("Right", new Queue<GameObject>());
-
-        currSpawnRatePerEnemy = new Dictionary<Enemy.Type, float>(initialSpawnRatePerEnemy);
-        currSpawnNumPerEnemy = new Dictionary<Enemy.Type, float>(initialSpawnNumPerEnemy);
-        lastIncreasedPerEnemy = new Dictionary<Enemy.Type, float>(initialLastIncreasedPerEnemy);
-        highestEnemyType = initialEnemyType;
-
-        UpdateInfestationCount(0);
-        Time.timeScale = 1.0f;
-    }
-
     void UpdateInfestationCount(int count)
     {
         CDebug.Log(CDebug.EDebugLevel.DEBUG, "count=" + count);
         infestationCount = count;
-        anim.SetInteger("count", infestationCount);
+        babyFrogAnimator.SetInteger("count", infestationCount);
     }
 
 }

@@ -7,6 +7,7 @@ public class LadybugEnemy : Enemy
     {
         movement = 1.0f;
         hitsLeft = 2;
+        type = Enemy.Type.LADYBUG;
     }
 
 }

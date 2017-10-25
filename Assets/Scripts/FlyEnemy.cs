@@ -11,6 +11,7 @@ public class FlyEnemy : Enemy
     {
         movement = 3.0f;
         hitsLeft = 1;
+        type = Enemy.Type.FLY;
     }
     
     public override void Move()

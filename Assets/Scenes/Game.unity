@@ -561,7 +561,7 @@ GameObject:
   m_Component:
   - component: {fileID: 223527868}
   m_Layer: 0
-  m_Name: Info
+  m_Name: NewEnemyWarning
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -580,7 +580,7 @@ Transform:
   - {fileID: 350818434}
   - {fileID: 1122787581}
   m_Father: {fileID: 0}
-  m_RootOrder: 7
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &240074713
 GameObject:
@@ -741,7 +741,7 @@ RectTransform:
   m_Children:
   - {fileID: 946880015}
   m_Father: {fileID: 0}
-  m_RootOrder: 8
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -1608,6 +1608,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 626320226}
+  - {fileID: 695634260}
   m_Father: {fileID: 0}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1759,7 +1760,7 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 695634259}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -1767,8 +1768,8 @@ Transform:
   - {fileID: 1842032266}
   - {fileID: 164744730}
   - {fileID: 624055596}
-  m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_Father: {fileID: 647132148}
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &722485324
 GameObject:
@@ -1901,7 +1902,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 11
+  m_RootOrder: 10
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &946880014
 GameObject:
@@ -2141,7 +2142,7 @@ RectTransform:
   - {fileID: 446130333}
   - {fileID: 1068749812}
   m_Father: {fileID: 0}
-  m_RootOrder: 9
+  m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -3212,7 +3213,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1466106887}
   m_Layer: 0
-  m_Name: Keys
+  m_Name: ControlsOverlay
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3233,7 +3234,7 @@ Transform:
   - {fileID: 59285213}
   - {fileID: 1789289795}
   m_Father: {fileID: 0}
-  m_RootOrder: 6
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1483508992
 GameObject:
@@ -3660,11 +3661,14 @@ MonoBehaviour:
   minSpawnRate: 0.1
   deltaSpawnNum: 0.25
   maxSpawnNum: 1
-  frogs:
-  - {fileID: 240074713}
-  - {fileID: 1821401128}
-  - {fileID: 1390514827}
-  - {fileID: 2087469665}
+  upZone: {fileID: 1101202673}
+  downZone: {fileID: 8633230}
+  leftZone: {fileID: 2100564658}
+  rightZone: {fileID: 1737917428}
+  upFrog: {fileID: 240074713}
+  downFrog: {fileID: 1821401128}
+  leftFrog: {fileID: 1390514827}
+  rightFrog: {fileID: 2087469665}
   babyFrog: {fileID: 1383816511}
   audioSource: {fileID: 647132152}
   sound: {fileID: 8300000, guid: 8bef53b3cf5737f428ecd12bdb6599d1, type: 3}
@@ -3676,18 +3680,11 @@ MonoBehaviour:
     type: 2}
   ladybugEnemyPrefab: {fileID: 4994900873364730, guid: 58257201e960eab4c8206066138adb69,
     type: 2}
-  upZone: {fileID: 1101202673}
-  downZone: {fileID: 8633230}
-  leftZone: {fileID: 2100564658}
-  rightZone: {fileID: 1737917428}
   frogDisabledSprite: {fileID: 21300000, guid: 589a7a1d7e3be6147b401ebc902b5108, type: 3}
   frogEnabledSprite: {fileID: 21300000, guid: 2235c656f801009438700ab45da4bce8, type: 3}
   plusSprite: {fileID: 21300000, guid: 2269c435ab5b65a4ab1088b80cb5c94f, type: 3}
-  flySprite: {fileID: 21300000, guid: fcb2ce12d016d054ca29ea7365e7473d, type: 3}
-  beeSprite: {fileID: 21300000, guid: 5ae59af692c2be44cb2f380762932c4e, type: 3}
-  ladybugSprite: {fileID: 21300000, guid: ede2cb582233e7149b89f0c342605924, type: 3}
-  keys: {fileID: 1466106886}
-  info: {fileID: 223527867}
+  controlsOverlay: {fileID: 1466106886}
+  newEnemyWarning: {fileID: 223527867}
   inGameUI: {fileID: 299961524}
   pauseGameUI: {fileID: 1019002069}
   endGameUI: {fileID: 1776214778}
@@ -3792,7 +3789,7 @@ RectTransform:
   - {fileID: 1120449392}
   - {fileID: 169229623}
   m_Father: {fileID: 0}
-  m_RootOrder: 10
+  m_RootOrder: 9
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}

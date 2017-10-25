@@ -7,6 +7,7 @@ public class BeeEnemy : Enemy
     {
         movement = 1.0f;
         hitsLeft = 1;
+        type = Enemy.Type.BEE;
     }
     
 }
