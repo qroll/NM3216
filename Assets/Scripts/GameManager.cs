@@ -208,7 +208,8 @@ public class GameManager : MonoBehaviour {
         {
             { Enemy.Type.FLY, currTime },
             { Enemy.Type.BEE, currTime },
-            { Enemy.Type.LADYBUG, currTime }
+            { Enemy.Type.LADYBUG, currTime },
+            { Enemy.Type.FIREFLY, currTime }
         };
         
         Time.timeScale = 1.0f;
