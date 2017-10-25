@@ -3,7 +3,8 @@
 public class Blind : MonoBehaviour {
 
     private float t = 0.0f;
-    private float maxT = 3.0f;
+    private float alphaT = 0.0f;
+    private float maxT = 2.0f;
 
     // Use this for initialization
     void Start()
@@ -14,7 +15,12 @@ public class Blind : MonoBehaviour {
 	// Update is called once per frame
 	void Update()
     {
-        float alpha = Mathf.Lerp(1, 0, t / maxT);
+        if (t < 1.0f)
+        {
+            t += Time.deltaTime;
+            return;
+        }
+        float alpha = Mathf.Lerp(1, 0, alphaT / maxT);
         if (alpha == 0)
         {
             Object.Destroy(this);
@@ -22,7 +28,7 @@ public class Blind : MonoBehaviour {
         {
             SpriteRenderer sr = GetComponent<SpriteRenderer>();
             sr.color = new Color(sr.color.r, sr.color.g, sr.color.b, alpha);
-            t += Time.deltaTime;
+            alphaT += Time.deltaTime;
         }
 
     }
