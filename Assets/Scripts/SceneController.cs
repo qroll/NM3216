@@ -8,14 +8,19 @@ public class SceneController : MonoBehaviour {
 
     public Text loadingText;
 
+    private bool loading;
+
 	// Use this for initialization
 	void Start () {
-        StartCoroutine(LoadGame());
+        loadingText.enabled = false;
     }
 	
 	// Update is called once per frame
 	void Update () {
-        loadingText.color = new Color(loadingText.color.r, loadingText.color.g, loadingText.color.b, Mathf.PingPong(Time.time, 1));
+        if (loading)
+        {
+            loadingText.color = new Color(loadingText.color.r, loadingText.color.g, loadingText.color.b, Mathf.PingPong(Time.time, 1));
+        }
     }
 
     IEnumerator LoadGame()
@@ -33,5 +38,11 @@ public class SceneController : MonoBehaviour {
         }
 
         operation.allowSceneActivation = true;
+    }
+
+    public void OnPlayClick()
+    {
+        loadingText.enabled = true;
+        StartCoroutine(LoadGame());
     }
 }
