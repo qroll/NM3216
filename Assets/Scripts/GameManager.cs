@@ -81,7 +81,7 @@ public class GameManager : MonoBehaviour
 
     // constants
     private static string[] ZONE_AXES = { "Vertical", "Horizontal" };
-    private const float AXIS_RANGE = 0.9f;
+    private const float AXIS_RANGE = 0.75f;
     private const float SUCCESS_TIME = 5.0f;
 
     // references to frequently accessed objects or components
