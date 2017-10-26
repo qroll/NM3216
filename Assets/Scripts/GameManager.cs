@@ -435,10 +435,7 @@ public class GameManager : MonoBehaviour
         else if (isSwatterActive)
         {
             // no enemy was found within the swat zone, disable the swatter temporarily
-            isFrogEnabledInZone[zone] = false;
-            SpriteRenderer sr = frogInZone[zone].GetComponent<SpriteRenderer>();
-            sr.sprite = frogDisabledSprite;
-            StartCoroutine(EnableSwatter(stunTime, zone));
+            StunFrog(zone);
             // reset the kill count on a missed hit
             killCount = 0;
             lastSuccessTimeDelta = 0;
@@ -476,15 +473,7 @@ public class GameManager : MonoBehaviour
         yield return new WaitForSeconds(delay);
         obj.SetActive(false);
     }
-
-    IEnumerator EnableSwatter(float delay, string zone)
-    {
-        yield return new WaitForSeconds(delay);
-        isFrogEnabledInZone[zone] = true;
-        SpriteRenderer sr = frogInZone[zone].GetComponent<SpriteRenderer>();
-        sr.sprite = frogEnabledSprite;
-    }
-
+    
     void EatEnemy(string zone, GameObject enemy)
     {
         audioSource.PlayOneShot(sound);
@@ -515,6 +504,36 @@ public class GameManager : MonoBehaviour
         tongueLength.transform.localPosition = new Vector3(0, -targetSize / 2 + 1, 0);
 
         StartCoroutine(ResetFrog(zone));
+    }
+
+    private void StunFrog(string zone)
+    {
+        isFrogEnabledInZone[zone] = false;
+
+        // show stars circling above frog
+        GameObject frog = frogInZone[zone];
+        Transform dizzy = frog.transform.Find("dizzy");
+        dizzy.gameObject.SetActive(true);
+
+        // switch to sprite with disabled state
+        SpriteRenderer sr = frogInZone[zone].GetComponent<SpriteRenderer>();
+        sr.sprite = frogDisabledSprite;
+
+        StartCoroutine(UnstunFrog(zone));
+    }
+
+    IEnumerator UnstunFrog(string zone)
+    {
+        yield return new WaitForSeconds(stunTime);
+
+        isFrogEnabledInZone[zone] = true;
+
+        GameObject frog = frogInZone[zone];
+        Transform dizzy = frog.transform.Find("dizzy");
+        dizzy.gameObject.SetActive(false);
+        
+        SpriteRenderer sr = frogInZone[zone].GetComponent<SpriteRenderer>();
+        sr.sprite = frogEnabledSprite;
     }
 
     IEnumerator ResetFrog(string zone)
