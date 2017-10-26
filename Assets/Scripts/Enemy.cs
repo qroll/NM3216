@@ -1,14 +1,15 @@
 ﻿using UnityEngine;
 
-public class Enemy : MonoBehaviour {
+public class Enemy : MonoBehaviour
+{
 
     // For normal movement
     public bool isTrapped = false;
     public float movement = 1;
-    
+
     // For movement in the infestation zone
     public float angle = 0;
-    public float radius = 0.1f;
+    public float radius = 0.3f;
     public Vector3 pivot;
 
     // For enemy info
@@ -27,15 +28,16 @@ public class Enemy : MonoBehaviour {
     void Start()
     {
 
-	}
-	
-	// Update is called once per frame
-	void Update()
+    }
+
+    // Update is called once per frame
+    void Update()
     {
         if (isTrapped)
         {
             Trapped();
-        } else
+        }
+        else
         {
             Move();
         }

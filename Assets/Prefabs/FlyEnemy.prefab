@@ -110,7 +110,7 @@ MonoBehaviour:
   isTrapped: 0
   movement: 3
   angle: 0
-  radius: 0.1
+  radius: 0.3
   pivot: {x: 0, y: 0, z: 0}
   type: 0
   zone: 

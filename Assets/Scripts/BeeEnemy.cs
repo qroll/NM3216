@@ -9,5 +9,5 @@ public class BeeEnemy : Enemy
         hitsLeft = 1;
         type = Enemy.Type.BEE;
     }
-    
+
 }

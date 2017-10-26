@@ -1,22 +1,24 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-public class SceneController : MonoBehaviour {
+public class SceneController : MonoBehaviour
+{
 
     public Text loadingText;
 
     private bool loading;
 
-	// Use this for initialization
-	void Start () {
+    // Use this for initialization
+    void Start()
+    {
         loadingText.enabled = false;
     }
-	
-	// Update is called once per frame
-	void Update () {
+
+    // Update is called once per frame
+    void Update()
+    {
         if (loading)
         {
             loadingText.color = new Color(loadingText.color.r, loadingText.color.g, loadingText.color.b, Mathf.PingPong(Time.time, 1));
@@ -25,6 +27,7 @@ public class SceneController : MonoBehaviour {
 
     IEnumerator LoadGame()
     {
+        loading = true;
         // yield return new WaitForSeconds(3);
 
         AsyncOperation operation = SceneManager.LoadSceneAsync("Game", LoadSceneMode.Single);

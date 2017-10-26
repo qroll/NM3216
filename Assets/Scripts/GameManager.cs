@@ -1,8 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
-public class GameManager : MonoBehaviour {
+public class GameManager : MonoBehaviour
+{
 
     public CDebug.EDebugLevel debugLevel = CDebug.EDebugLevel.TRACE;
 
@@ -22,8 +24,7 @@ public class GameManager : MonoBehaviour {
     public float stunTime = 1.0f;
     [Tooltip("Starting unlocked enemies")]
     public Enemy.Type initialEnemyType = Enemy.Type.FLY;
-
-
+    
     // controls the frequency of spawning
     [Tooltip("Change in frequency on success")]
     public float deltaSpawnRate = 1.0f;
@@ -48,7 +49,7 @@ public class GameManager : MonoBehaviour {
     public GameObject downFrog;
     public GameObject leftFrog;
     public GameObject rightFrog;
-    
+
     // Player specific references
     public GameObject babyFrog;
     public AudioSource audioSource;
@@ -89,6 +90,7 @@ public class GameManager : MonoBehaviour {
 
     // Game status
     private bool isGameOver = false;
+    private bool isGamePaused = false;
     private bool firstKill = true;
     private Dictionary<string, bool> isFrogEnabledInZone = new Dictionary<string, bool>();
     private int infestationCount = 0;
@@ -171,7 +173,7 @@ public class GameManager : MonoBehaviour {
             SpriteRenderer sr = sprite.GetComponent<SpriteRenderer>();
             sr.sprite = frogEnabledSprite;
         }
-        
+
         // remove all remaining enemies
         foreach (GameObject obj in GameObject.FindGameObjectsWithTag("Enemy"))
         {
@@ -180,8 +182,9 @@ public class GameManager : MonoBehaviour {
 
         // reset game state
         isGameOver = false;
+        isGamePaused = false;
         firstKill = true;
-        
+
         isFrogEnabledInZone.Clear();
         isFrogEnabledInZone.Add("Up", true);
         isFrogEnabledInZone.Add("Down", true);
@@ -201,7 +204,7 @@ public class GameManager : MonoBehaviour {
         lastSuccessTimeDelta = 0;
         killCount = 0;
         successCount = 0;
-        
+
         currSpawnRatePerEnemy = new Dictionary<Enemy.Type, float>(initialSpawnRatePerEnemy);
         currSpawnNumPerEnemy = new Dictionary<Enemy.Type, float>(initialSpawnNumPerEnemy);
         lastIncreasedPerEnemy = new Dictionary<Enemy.Type, float>()
@@ -211,7 +214,7 @@ public class GameManager : MonoBehaviour {
             { Enemy.Type.LADYBUG, currTime },
             { Enemy.Type.FIREFLY, currTime }
         };
-        
+
         Time.timeScale = 1.0f;
     }
 
@@ -223,11 +226,11 @@ public class GameManager : MonoBehaviour {
         }
         controlsOverlay.SetActive(false);
     }
-	
-	// Update is called once per frame
-	void Update()
+
+    // Update is called once per frame
+    void Update()
     {
-        if (isGameOver)
+        if (isGameOver || isGamePaused)
         {
             return;
         }
@@ -241,7 +244,8 @@ public class GameManager : MonoBehaviour {
             {
                 lastSuccessTimeDelta = 0;
                 IncreaseDifficulty();
-            } else
+            }
+            else
             {
                 lastSuccessTimeDelta += deltaTime;
             }
@@ -267,7 +271,7 @@ public class GameManager : MonoBehaviour {
             }
         }
     }
-    
+
     // Spawns an enemy tagged with its corresponding zone
     void SpawnEnemy(Enemy.Type type)
     {
@@ -296,7 +300,7 @@ public class GameManager : MonoBehaviour {
                 enemy = Instantiate(enemyPrefab).gameObject;
                 break;
         }
-        
+
         switch (zone)
         {
             case "Up":
@@ -349,14 +353,16 @@ public class GameManager : MonoBehaviour {
         if (axis == "Horizontal")
         {
             return sign == 1 ? ZONE_RIGHT : ZONE_LEFT;
-        } else
+        }
+        else
         {
             return sign == 1 ? ZONE_UP : ZONE_DOWN;
         }
     }
 
     // Returns a spawning position at the edge of the screen
-    Vector3 GeneratePosition() {
+    Vector3 GeneratePosition()
+    {
         Vector3 position;
 
         position = Camera.main.ViewportToWorldPoint(new Vector3(0.5f, 1.0f, distFromCamera));
@@ -379,7 +385,7 @@ public class GameManager : MonoBehaviour {
     // enemy closest to the player in the specified zone
     public void Swat(string zone)
     {
-        if (isGameOver)
+        if (isGameOver || isGamePaused)
         {
             return;
         }
@@ -390,7 +396,7 @@ public class GameManager : MonoBehaviour {
         {
             firstKill = false;
         }
-        
+
         // prioritize enemies in the infestation zone
         if (infestationZones[zone].Count > 0)
         {
@@ -420,11 +426,13 @@ public class GameManager : MonoBehaviour {
             {
                 EatAndDestroyEnemy(zone, closest);
                 //EnemySwatted(closest);
-            } else
+            }
+            else
             {
                 EatEnemy(zone, closest);
             }
-        } else if (isSwatterActive)
+        }
+        else if (isSwatterActive)
         {
             // no enemy was found within the swat zone, disable the swatter temporarily
             isFrogEnabledInZone[zone] = false;
@@ -495,20 +503,20 @@ public class GameManager : MonoBehaviour {
         GameObject frog = frogInZone[zone];
         Transform tongue = frog.transform.Find("tongue");
         Transform tongueLength = tongue.transform.Find("tongue-length");
-        
+
         Vector3 direction = frog.transform.position - enemy.transform.position;
         frog.transform.up = direction.normalized;
 
         float targetSize = direction.magnitude;
         float currentSize = tongueLength.GetComponent<Renderer>().bounds.size.y;
         float scale = targetSize / currentSize;
-        
+
         tongueLength.localScale = new Vector3(1, scale, 1);
-        tongueLength.transform.localPosition = new Vector3(0, -targetSize/2 + 1, 0);
-        
+        tongueLength.transform.localPosition = new Vector3(0, -targetSize / 2 + 1, 0);
+
         StartCoroutine(ResetFrog(zone));
     }
-    
+
     IEnumerator ResetFrog(string zone)
     {
         yield return new WaitForSeconds(0.1f);
@@ -639,7 +647,7 @@ public class GameManager : MonoBehaviour {
     // Inform GameManager that an enemy has reached the infestation zone
     public void EnemyReached(GameObject obj)
     {
-        Enemy control = (Enemy) obj.GetComponent("Enemy");
+        Enemy control = (Enemy)obj.GetComponent("Enemy");
         control.angle = Mathf.Atan2(obj.transform.position.y, obj.transform.position.x);
         control.isTrapped = true;
 
@@ -656,9 +664,9 @@ public class GameManager : MonoBehaviour {
             isGameOver = true;
 
             GameObject[] gos = GameObject.FindGameObjectsWithTag("Enemy");
-            for (int i=0; i < gos.Length; i++)
+            for (int i = 0; i < gos.Length; i++)
             {
-                Enemy script = (Enemy) gos[i].GetComponent("Enemy");
+                Enemy script = (Enemy)gos[i].GetComponent("Enemy");
                 script.movement = 0;
             }
         }
@@ -667,14 +675,19 @@ public class GameManager : MonoBehaviour {
     public void OnPauseButton()
     {
         Time.timeScale = 0;
+        isGamePaused = true;
 
         pauseGameUI.SetActive(true);
         inGameUI.SetActive(false);
+
+        EventSystem.current.SetSelectedGameObject(null);
+        EventSystem.current.SetSelectedGameObject(pauseGameUI.transform.Find("Menu/Resume").gameObject);
     }
 
     public void OnResumeButton()
     {
         Time.timeScale = 1.0f;
+        isGamePaused = false;
 
         pauseGameUI.SetActive(false);
         inGameUI.SetActive(true);

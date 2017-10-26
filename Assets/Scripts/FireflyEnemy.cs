@@ -9,6 +9,7 @@ public class FireflyEnemy : Enemy
     {
         movement = 1.0f;
         hitsLeft = 1;
+        type = Enemy.Type.FIREFLY;
     }
 
     // Returns true if the enemy is killed on this hit
