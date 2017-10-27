@@ -21,7 +21,7 @@ public class Enemy : MonoBehaviour
 
     public enum Type
     {
-        FLY, BEE, LADYBUG, FIREFLY, MAX
+        FLY, LADYBUG, BEE, FIREFLY, MAX
     }
 
     // Use this for initialization

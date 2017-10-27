@@ -24,12 +24,10 @@ public class GameManager : MonoBehaviour
     public float stunTime = 1.0f;
     [Tooltip("Starting unlocked enemies")]
     public Enemy.Type initialEnemyType = Enemy.Type.FLY;
-    
+
     // controls the frequency of spawning
     [Tooltip("Change in frequency on success")]
     public float deltaSpawnRate = 1.0f;
-    [Tooltip("Min frequency before all enemies are unlocked")]
-    public float initialMinSpawnRate = 1.0f;
     [Tooltip("Min frequency")]
     public float minSpawnRate = 0.1f;
 
@@ -111,9 +109,9 @@ public class GameManager : MonoBehaviour
     private static Dictionary<Enemy.Type, float> initialSpawnRatePerEnemy = new Dictionary<Enemy.Type, float>()
     {
         { Enemy.Type.FLY, 3.0f },
-        { Enemy.Type.BEE, 5.0f },
+        { Enemy.Type.BEE, 7.0f },
         { Enemy.Type.LADYBUG, 5.0f },
-        { Enemy.Type.FIREFLY, 5.0f }
+        { Enemy.Type.FIREFLY, 10.0f }
     };
 
     private static Dictionary<Enemy.Type, float> initialSpawnNumPerEnemy = new Dictionary<Enemy.Type, float>()
@@ -126,10 +124,10 @@ public class GameManager : MonoBehaviour
 
     private static Dictionary<Enemy.Type, System.Func<int, float>> spawnRateFormula = new Dictionary<Enemy.Type, System.Func<int, float>>()
     {
-        { Enemy.Type.FLY, x => 3 / Mathf.Pow(Mathf.Pow(3, 1 / 5.0f), x) },
-        { Enemy.Type.BEE, x => 5 / Mathf.Pow(Mathf.Pow(5, 1 / 5.0f), x) },
-        { Enemy.Type.LADYBUG, x => 5 / Mathf.Pow(Mathf.Pow(5 / 1, 1 / 5.0f), x) },
-        { Enemy.Type.FIREFLY, x => 5 / Mathf.Pow(Mathf.Pow(5 / 1, 1 / 5.0f), x) }
+        { Enemy.Type.FLY, x => 3 / Mathf.Pow(Mathf.Pow(3 / 0.8f, 1 / 5.0f), x) },
+        { Enemy.Type.BEE, x => 7 / Mathf.Pow(Mathf.Pow(7 / 2.0f, 1 / 5.0f), x) },
+        { Enemy.Type.LADYBUG, x => 5 / Mathf.Pow(Mathf.Pow(5 / 0.8f, 1 / 5.0f), x) },
+        { Enemy.Type.FIREFLY, x => 10 / Mathf.Pow(Mathf.Pow(10 / 4.2f, 1 / 5.0f), x) }
     };
 
     // Use this for initialization
@@ -473,7 +471,7 @@ public class GameManager : MonoBehaviour
         yield return new WaitForSeconds(delay);
         obj.SetActive(false);
     }
-    
+
     void EatEnemy(string zone, GameObject enemy)
     {
         audioSource.PlayOneShot(sound);
@@ -531,7 +529,7 @@ public class GameManager : MonoBehaviour
         GameObject frog = frogInZone[zone];
         Transform dizzy = frog.transform.Find("dizzy");
         dizzy.gameObject.SetActive(false);
-        
+
         SpriteRenderer sr = frogInZone[zone].GetComponent<SpriteRenderer>();
         sr.sprite = frogEnabledSprite;
     }
@@ -571,9 +569,11 @@ public class GameManager : MonoBehaviour
             Dictionary<Enemy.Type, float> newSpawnNumPerEnemy = new Dictionary<Enemy.Type, float>();
             foreach (KeyValuePair<Enemy.Type, float> entry in currSpawnRatePerEnemy)
             {
-                newSpawnRatePerEnemy[entry.Key] = Mathf.Max(currSpawnRatePerEnemy[entry.Key] - deltaSpawnRate, minSpawnRate);
-                newSpawnNumPerEnemy[entry.Key] = Mathf.Min(currSpawnNumPerEnemy[entry.Key] + deltaSpawnNum, maxSpawnNum);
-                CDebug.Log(CDebug.EDebugLevel.TRACE, string.Format("Increased spawn rate={0} | spawn num={1}", newSpawnRatePerEnemy[entry.Key], newSpawnNumPerEnemy[entry.Key]));
+                var type = entry.Key;
+
+                newSpawnRatePerEnemy[type] = Mathf.Max(currSpawnRatePerEnemy[type] - deltaSpawnRate, minSpawnRate);
+                newSpawnNumPerEnemy[type] = Mathf.Min(currSpawnNumPerEnemy[type] + deltaSpawnNum, maxSpawnNum);
+                CDebug.Log(CDebug.EDebugLevel.TRACE, string.Format("Type={0} | increased spawn rate={0} | spawn num={1}", type, newSpawnRatePerEnemy[type], newSpawnNumPerEnemy[type]));
             }
             currSpawnRatePerEnemy = newSpawnRatePerEnemy;
             currSpawnNumPerEnemy = newSpawnNumPerEnemy;
@@ -582,8 +582,8 @@ public class GameManager : MonoBehaviour
         else
         {
             successCount++;
-            currSpawnRatePerEnemy[currHighestEnemyType] = Mathf.Max(spawnRateFormula[currHighestEnemyType](successCount), initialMinSpawnRate);
-            CDebug.Log(CDebug.EDebugLevel.TRACE, string.Format("Increased success count={0} | spawn rate={1}", successCount, currSpawnRatePerEnemy[currHighestEnemyType]));
+            currSpawnRatePerEnemy[currHighestEnemyType] = spawnRateFormula[currHighestEnemyType](successCount);
+            CDebug.Log(CDebug.EDebugLevel.TRACE, string.Format("Type={0} | increased success count={1} | spawn rate={2}", currHighestEnemyType, successCount, currSpawnRatePerEnemy[currHighestEnemyType]));
             if (successCount == nextSuccessCount && currHighestEnemyType < Enemy.Type.MAX)
             {
                 successCount = 0;
@@ -638,8 +638,7 @@ public class GameManager : MonoBehaviour
         {
             killCount = 0;
             successCount++;
-            // currSpawnRatePerEnemy[type] = Mathf.Max(currSpawnRatePerEnemy[type] - deltaSpawnRate, initialMinSpawnRate);
-            currSpawnRatePerEnemy[type] = Mathf.Max(spawnRateFormula[type](successCount), initialMinSpawnRate);
+            currSpawnRatePerEnemy[type] = spawnRateFormula[type](successCount);
             CDebug.Log(CDebug.EDebugLevel.TRACE, string.Format("Increased success count={0} | spawn rate={1}", successCount, currSpawnRatePerEnemy[type]));
         }
         if (successCount == nextSuccessCount && currHighestEnemyType < Enemy.Type.MAX)
