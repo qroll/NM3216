@@ -79,7 +79,7 @@ public class Enemy : MonoBehaviour
         plus = new GameObject("Plus");
         SpriteRenderer plusSr = plus.AddComponent<SpriteRenderer>();
         plusSr.sprite = plusSprite;
-        plusSr.sortingLayerName = "Pickups";
+        plusSr.sortingLayerName = "Enemy";
         plus.transform.parent = transform;
         plus.transform.rotation = transform.rotation;
         plus.transform.localPosition = new Vector3(0.4f, -0.6f, 0);
