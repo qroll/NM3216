@@ -1,12 +1,15 @@
 fileFormatVersion: 2
 guid: c97a02131912dfa44b6e489a7aae09da
-timeCreated: 1508448136
+timeCreated: 1509111960
 licenseType: Free
 TextureImporter:
   fileIDToRecycleName:
     21300000: plants_0
     21300002: plants_1
     21300004: plants_2
+    21300006: plants_3
+    21300008: plants_4
+    21300010: plants_5
   serializedVersion: 4
   mipmaps:
     mipMapMode: 0
@@ -82,7 +85,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 0
-        y: 512
+        y: 1024
         width: 512
         height: 512
       alignment: 0
@@ -96,7 +99,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 512
-        y: 512
+        y: 1024
         width: 512
         height: 512
       alignment: 0
@@ -110,6 +113,48 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 0
+        y: 512
+        width: 512
+        height: 512
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: plants_3
+      rect:
+        serializedVersion: 2
+        x: 512
+        y: 512
+        width: 512
+        height: 512
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: plants_4
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 512
+        height: 512
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: plants_5
+      rect:
+        serializedVersion: 2
+        x: 512
         y: 0
         width: 512
         height: 512
