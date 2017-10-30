@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.EventSystems;
 
 public class GameManager : MonoBehaviour
 {
@@ -697,9 +696,6 @@ public class GameManager : MonoBehaviour
 
         pauseGameUI.SetActive(true);
         inGameUI.SetActive(false);
-
-        EventSystem.current.SetSelectedGameObject(null);
-        EventSystem.current.SetSelectedGameObject(pauseGameUI.transform.Find("Menu/Resume").gameObject);
     }
 
     public void OnResumeButton()

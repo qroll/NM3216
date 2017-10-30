@@ -13,6 +13,7 @@ public class SceneController : MonoBehaviour
     // Use this for initialization
     void Start()
     {
+        Time.timeScale = 1.0f;
         loadingText.enabled = false;
     }
 
