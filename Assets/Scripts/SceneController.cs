@@ -37,7 +37,6 @@ public class SceneController : MonoBehaviour
         //Wait until the last operation fully loads to return anything
         while (operation.progress < 0.9f)
         {
-            loadingText.text = "Loading... " + string.Format("{0:P1}", operation.progress);
             yield return null;
         }
 
