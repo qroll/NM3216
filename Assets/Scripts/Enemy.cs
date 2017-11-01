@@ -21,17 +21,17 @@ public class Enemy : MonoBehaviour
 
     public enum Type
     {
-        FLY, LADYBUG, BEE, FIREFLY, MAX
+        FLY, LADYBUG, BEE, BEETLE, FIREFLY, MAX
     }
 
     // Use this for initialization
-    void Start()
+    public virtual void Start()
     {
 
     }
 
     // Update is called once per frame
-    void Update()
+    public virtual void Update()
     {
         if (isTrapped)
         {
@@ -43,7 +43,7 @@ public class Enemy : MonoBehaviour
         }
     }
 
-    void Trapped()
+    public virtual void Trapped()
     {
         float x = radius * Mathf.Sin(angle) + pivot.x;
         float y = radius * Mathf.Cos(angle) + pivot.y;

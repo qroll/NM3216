@@ -3881,6 +3881,8 @@ MonoBehaviour:
     type: 2}
   ladybugEnemyPrefab: {fileID: 4994900873364730, guid: 58257201e960eab4c8206066138adb69,
     type: 2}
+  beetleEnemyPrefab: {fileID: 4428566135260364, guid: a52d7a29c1abe46468ee05473ad95110,
+    type: 2}
   fireflyEnemyPrefab: {fileID: 4994900873364730, guid: a16ff652353b58544a385d661f049dad,
     type: 2}
   frogDisabledSprite: {fileID: 21300000, guid: 589a7a1d7e3be6147b401ebc902b5108, type: 3}

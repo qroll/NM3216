@@ -57,6 +57,7 @@ public class GameManager : MonoBehaviour
     public Transform flyEnemyPrefab;
     public Transform beeEnemyPrefab;
     public Transform ladybugEnemyPrefab;
+    public Transform beetleEnemyPrefab;
     public Transform fireflyEnemyPrefab;
 
     // Sprites
@@ -79,7 +80,7 @@ public class GameManager : MonoBehaviour
     // constants
     private static string[] ZONE_AXES = { "Vertical", "Horizontal" };
     private const float AXIS_RANGE = 0.75f;
-    private const float SUCCESS_TIME = 5.0f;
+    private const float SUCCESS_TIME = 2.5f;
 
     // references to frequently accessed objects or components
     private Dictionary<string, GameObject> frogInZone = new Dictionary<string, GameObject>();
@@ -110,6 +111,7 @@ public class GameManager : MonoBehaviour
         { Enemy.Type.FLY, 3.0f },
         { Enemy.Type.BEE, 7.0f },
         { Enemy.Type.LADYBUG, 5.0f },
+        { Enemy.Type.BEETLE, 7.0f },
         { Enemy.Type.FIREFLY, 10.0f }
     };
 
@@ -118,15 +120,17 @@ public class GameManager : MonoBehaviour
         { Enemy.Type.FLY, 1.0f },
         { Enemy.Type.BEE, 1.0f },
         { Enemy.Type.LADYBUG, 1.0f },
+        { Enemy.Type.BEETLE, 1.0f },
         { Enemy.Type.FIREFLY, 1.0f }
     };
 
     private static Dictionary<Enemy.Type, System.Func<int, float>> spawnRateFormula = new Dictionary<Enemy.Type, System.Func<int, float>>()
     {
-        { Enemy.Type.FLY, x => 3 / Mathf.Pow(Mathf.Pow(3 / 0.8f, 1 / 5.0f), x) },
-        { Enemy.Type.BEE, x => 7 / Mathf.Pow(Mathf.Pow(7 / 2.0f, 1 / 5.0f), x) },
-        { Enemy.Type.LADYBUG, x => 5 / Mathf.Pow(Mathf.Pow(5 / 0.8f, 1 / 5.0f), x) },
-        { Enemy.Type.FIREFLY, x => 10 / Mathf.Pow(Mathf.Pow(10 / 4.2f, 1 / 5.0f), x) }
+        { Enemy.Type.FLY, x => 3 / Mathf.Pow(Mathf.Pow(3 / 0.8f, 1 / 11.0f), x) },
+        { Enemy.Type.BEE, x => 7 / Mathf.Pow(Mathf.Pow(7 / 2.0f, 1 / 11.0f), x) },
+        { Enemy.Type.LADYBUG, x => 5 / Mathf.Pow(Mathf.Pow(5 / 0.8f, 1 / 11.0f), x) },
+        { Enemy.Type.BEETLE, x => 7 / Mathf.Pow(Mathf.Pow(7 / 2.0f, 1 / 11.0f), x) },
+        { Enemy.Type.FIREFLY, x => 10 / Mathf.Pow(Mathf.Pow(10 / 4.2f, 1 / 11.0f), x) }
     };
 
     // Use this for initialization
@@ -209,6 +213,7 @@ public class GameManager : MonoBehaviour
             { Enemy.Type.FLY, currTime },
             { Enemy.Type.BEE, currTime },
             { Enemy.Type.LADYBUG, currTime },
+            { Enemy.Type.BEETLE, currTime },
             { Enemy.Type.FIREFLY, currTime }
         };
 
@@ -290,6 +295,9 @@ public class GameManager : MonoBehaviour
             case Enemy.Type.LADYBUG:
                 enemy = Instantiate(ladybugEnemyPrefab).gameObject;
                 break;
+            case Enemy.Type.BEETLE:
+                enemy = Instantiate(beetleEnemyPrefab).gameObject;
+                break;
             case Enemy.Type.FIREFLY:
                 enemy = Instantiate(fireflyEnemyPrefab).gameObject;
                 break;
@@ -335,6 +343,12 @@ public class GameManager : MonoBehaviour
                 break;
             case Enemy.Type.LADYBUG:
                 enemyScript.AddSprite(plusSprite);
+                break;
+            case Enemy.Type.BEETLE:
+                enemyScript.AddSprite(plusSprite);
+                Vector3 coords = Camera.main.ViewportToWorldPoint(new Vector3(0.5f, 1 - swatRadius, distFromCamera));
+                float radius = coords.magnitude;
+                ((BeetleEnemy)enemyScript).distance = radius;
                 break;
             default:
                 break;
