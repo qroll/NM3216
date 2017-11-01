@@ -7,6 +7,8 @@ public class SceneController : MonoBehaviour
 {
 
     public Text loadingText;
+    public GameObject helpUI;
+    public GameObject mainUI;
 
     private bool loading;
 
@@ -48,4 +50,26 @@ public class SceneController : MonoBehaviour
         loadingText.enabled = true;
         StartCoroutine(LoadGame());
     }
+
+    public void OnHelpClick()
+    {
+        helpUI.SetActive(true);
+        mainUI.SetActive(false);
+    }
+
+    public void OnMainClick()
+    {
+        helpUI.SetActive(false);
+        mainUI.SetActive(true);
+    }
+
+    public void QuitGame()
+    {
+        #if UNITY_EDITOR
+            UnityEditor.EditorApplication.isPlaying = false;
+        #else
+            Application.Quit();
+        #endif
+    }
+
 }
