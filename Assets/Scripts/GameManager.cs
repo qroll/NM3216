@@ -16,7 +16,7 @@ public class GameManager : MonoBehaviour
     [Tooltip("Number of kills to next increase in success")]
     public int nextKillCount = 5;
     [Tooltip("Number of successes to next increase in difficulty")]
-    public int nextSuccessCount = 5;
+    public int nextSuccessCount = 12;
     [Tooltip("Max number of enemies before game over")]
     public int maxNumEnemies = 3;
     [Tooltip("Duration of stun (seconds)")]
@@ -595,9 +595,12 @@ public class GameManager : MonoBehaviour
         else
         {
             successCount++;
-            currSpawnRatePerEnemy[currHighestEnemyType] = spawnRateFormula[currHighestEnemyType](successCount);
-            CDebug.Log(CDebug.EDebugLevel.TRACE, string.Format("Type={0} | increased success count={1} | spawn rate={2}", currHighestEnemyType, successCount, currSpawnRatePerEnemy[currHighestEnemyType]));
-            if (successCount == nextSuccessCount && currHighestEnemyType < Enemy.Type.MAX)
+            if (successCount < nextSuccessCount)
+            {
+                currSpawnRatePerEnemy[currHighestEnemyType] = spawnRateFormula[currHighestEnemyType](successCount);
+                CDebug.Log(CDebug.EDebugLevel.TRACE, string.Format("Type={0} | increased success count={1} | spawn rate={2}", currHighestEnemyType, successCount, currSpawnRatePerEnemy[currHighestEnemyType]));
+            }
+            else if (successCount >= nextSuccessCount && currHighestEnemyType < Enemy.Type.MAX)
             {
                 successCount = 0;
                 currHighestEnemyType++;

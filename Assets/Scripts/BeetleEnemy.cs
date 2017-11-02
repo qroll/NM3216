@@ -7,6 +7,7 @@ public class BeetleEnemy : Enemy
 
     private float t = 0;
     private bool inRange = false;
+    private bool inView = true;
     private SpriteRenderer sr;
 
     public BeetleEnemy()
@@ -33,13 +34,11 @@ public class BeetleEnemy : Enemy
             {
                 if (transform.position.magnitude <= distance)
                 {
-                    sr.color = new Color(1, 1, 1, 1);
-                    
-                    SpriteRenderer plusSr = transform.Find("Plus").GetComponent<SpriteRenderer>();
-                    plusSr.color = new Color(1, 1, 1, 1);
-
                     inRange = true;
-                } else
+                    inView = false;
+                    t = 0;
+                }
+                else
                 {
                     t += Time.deltaTime;
                     float alpha = 1 - Mathf.SmoothStep(0, 1, t);
@@ -50,8 +49,25 @@ public class BeetleEnemy : Enemy
                 }
             }
 
-            Move();
+            if (!inView)
+            {
+                t += Time.deltaTime;
+                float alpha = Mathf.SmoothStep(0, 1, t * 2.0f);
+                sr.color = new Color(1, 1, 1, alpha);
+
+                SpriteRenderer plusSr = transform.Find("Plus").GetComponent<SpriteRenderer>();
+                plusSr.color = new Color(1, 1, 1, alpha);
+
+                if (alpha == 1.0f)
+                {
+                    inView = true;
+                }
+            }
+            else
+            {
+                Move();
+            }
         }
     }
-    
+
 }

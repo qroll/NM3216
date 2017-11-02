@@ -12,7 +12,7 @@ public class MenuController : MonoBehaviour {
     }
 	
 	void Update () {
-        if (EventSystem.current.currentSelectedGameObject == null)
+        if (EventSystem.current.currentSelectedGameObject == null || !EventSystem.current.currentSelectedGameObject.activeInHierarchy)
         {
             EventSystem.current.SetSelectedGameObject(button);
         }
