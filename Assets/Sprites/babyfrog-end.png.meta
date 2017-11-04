@@ -1,6 +1,6 @@
 fileFormatVersion: 2
 guid: b0eb108d8f060a54c87ee4854fc70aaa
-timeCreated: 1509776310
+timeCreated: 1509804724
 licenseType: Free
 TextureImporter:
   fileIDToRecycleName:
@@ -8,6 +8,10 @@ TextureImporter:
     21300002: babyfrog-end_1
     21300004: babyfrog-end_2
     21300006: babyfrog-end_3
+    21300008: babyfrog-end_4
+    21300010: babyfrog-end_5
+    21300012: babyfrog-end_6
+    21300014: babyfrog-end_7
   serializedVersion: 4
   mipmaps:
     mipMapMode: 0
@@ -83,7 +87,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 0
-        y: 1024
+        y: 3072
         width: 1024
         height: 1024
       alignment: 0
@@ -97,7 +101,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 1024
-        y: 1024
+        y: 3072
         width: 1024
         height: 1024
       alignment: 0
@@ -111,7 +115,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 0
-        y: 0
+        y: 2048
         width: 1024
         height: 1024
       alignment: 0
@@ -122,6 +126,62 @@ TextureImporter:
       tessellationDetail: 0
     - serializedVersion: 2
       name: babyfrog-end_3
+      rect:
+        serializedVersion: 2
+        x: 1024
+        y: 2048
+        width: 1024
+        height: 1024
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: babyfrog-end_4
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 1024
+        width: 1024
+        height: 1024
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: babyfrog-end_5
+      rect:
+        serializedVersion: 2
+        x: 1024
+        y: 1024
+        width: 1024
+        height: 1024
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: babyfrog-end_6
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 1024
+        height: 1024
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: babyfrog-end_7
       rect:
         serializedVersion: 2
         x: 1024

@@ -336,6 +336,7 @@ public class GameManager : MonoBehaviour
         // populate with enemy-specific info
         Enemy enemyScript = enemy.GetComponent<Enemy>();
         enemyScript.zone = zone;
+        enemyScript.pivot = frogInZone[zone].transform.position;
 
         switch (type)
         {
@@ -686,13 +687,11 @@ public class GameManager : MonoBehaviour
     public void EnemyReached(GameObject obj)
     {
         Enemy control = (Enemy)obj.GetComponent("Enemy");
-        control.angle = Mathf.Atan2(obj.transform.position.y, obj.transform.position.x);
-        control.isTrapped = true;
+        control.Trap();
 
         string zone = control.zone;
         infestationZones[zone].Enqueue(obj);
         UpdateInfestationCount(infestationCount + 1);
-        control.pivot = frogInZone[zone].transform.position;
 
         if (infestationCount >= maxNumEnemies)
         {

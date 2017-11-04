@@ -23,6 +23,12 @@ public class Enemy : MonoBehaviour
     public SpriteRenderer healthBarSR;
     public Animator healthBarAnim;
 
+    // For transitioning to the trapped state
+    private bool hasBeenTrapped = false;
+    private float deltaTimeTrapped = 0;
+    private Vector3 targetPos, originalPos;
+    private Vector3 targetRot, originalRot;
+
     public enum Type
     {
         FLY, LADYBUG, BEE, BEETLE, FIREFLY, MAX
@@ -47,15 +53,46 @@ public class Enemy : MonoBehaviour
         }
     }
 
+    public void Trap()
+    {
+        isTrapped = true;
+
+        originalPos = transform.position;
+        angle = Mathf.Atan2(transform.position.y, transform.position.x);
+        float x = radius * Mathf.Sin(angle) + pivot.x;
+        float y = radius * Mathf.Cos(angle) + pivot.y;
+        targetPos = new Vector3(x, y, transform.position.z);
+
+        originalRot = transform.up;
+        targetRot = pivot;
+    }
+
     public virtual void Trapped()
     {
+        if (!hasBeenTrapped)
+        {
+            transform.position = Vector3.Lerp(originalPos, targetPos, deltaTimeTrapped * 2);
+            transform.up = Vector3.Lerp(originalRot, targetRot, deltaTimeTrapped * 2);
+            deltaTimeTrapped += Time.deltaTime;
+            if (transform.position == targetPos)
+            {
+                hasBeenTrapped = true;
+            }
+            return;
+        }
+
         float x = radius * Mathf.Sin(angle) + pivot.x;
         float y = radius * Mathf.Cos(angle) + pivot.y;
         Vector3 position = new Vector3(x, y, transform.position.z);
 
         // update position and rotation around the pivot point
         transform.position = position;
-        transform.right = position;
+        transform.up = pivot;
+
+        if (healthBar != null)
+        {
+            healthBar.transform.rotation = Quaternion.identity;
+        }
 
         angle += Time.deltaTime;
     }
@@ -81,9 +118,6 @@ public class Enemy : MonoBehaviour
     public void AddHealthBar(GameObject prefab)
     {
         healthBar = Instantiate(prefab);
-        SpriteRenderer plusSr = healthBar.GetComponent<SpriteRenderer>();
-        plusSr.sortingLayerName = "Enemy";
-        plusSr.sortingOrder = 2;
 
         healthBar.transform.parent = transform;
         healthBar.transform.rotation = Quaternion.identity;

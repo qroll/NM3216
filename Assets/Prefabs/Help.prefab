@@ -1237,7 +1237,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1.25
-  m_Text: Press the correct arrow key to eat an insect when it is in the light blue
+  m_Text: Press the correct arrow key to eat an insect when it's in the light blue
     and dark blue zones
 --- !u!114 &114472476146777828
 MonoBehaviour:

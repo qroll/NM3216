@@ -115,8 +115,9 @@ MonoBehaviour:
   type: 0
   zone: 
   hitsLeft: 1
-  plus: {fileID: 0}
-  plusSprite: {fileID: 0}
+  healthBar: {fileID: 0}
+  healthBarSR: {fileID: 0}
+  healthBarAnim: {fileID: 0}
   m_centerPosition: {x: 0, y: 0, z: 0}
   m_degrees: 0
 --- !u!212 &212707039433079472
