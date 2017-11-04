@@ -59,11 +59,11 @@ public class GameManager : MonoBehaviour
     public Transform ladybugEnemyPrefab;
     public Transform beetleEnemyPrefab;
     public Transform fireflyEnemyPrefab;
+    public GameObject bubblePrefab;
 
     // Sprites
     public Sprite frogDisabledSprite;
     public Sprite frogEnabledSprite;
-    public Sprite plusSprite;
 
     // UI elements
     public GameObject controlsOverlay;
@@ -71,6 +71,7 @@ public class GameManager : MonoBehaviour
     public GameObject inGameUI;
     public GameObject pauseGameUI;
     public GameObject endGameUI;
+    public GameObject helpUI;
 
     public const string ZONE_UP = "Up";
     public const string ZONE_DOWN = "Down";
@@ -150,6 +151,8 @@ public class GameManager : MonoBehaviour
         float s_baseOrthographicSize = Screen.height / 32.0f / 2.0f;
         Camera.main.orthographicSize = s_baseOrthographicSize;
         */
+
+        //Screen.SetResolution(Screen.height, Screen.height, Screen.fullScreen);
 
         babyFrogAnimator = babyFrog.GetComponent<Animator>();
 
@@ -342,10 +345,10 @@ public class GameManager : MonoBehaviour
             case Enemy.Type.BEE:
                 break;
             case Enemy.Type.LADYBUG:
-                enemyScript.AddSprite(plusSprite);
+                enemyScript.AddHealthBar(bubblePrefab);
                 break;
             case Enemy.Type.BEETLE:
-                enemyScript.AddSprite(plusSprite);
+                enemyScript.AddHealthBar(bubblePrefab);
                 Vector3 coords = Camera.main.ViewportToWorldPoint(new Vector3(0.5f, 1 - swatRadius, distFromCamera));
                 float radius = coords.magnitude;
                 ((BeetleEnemy)enemyScript).distance = radius;
@@ -530,6 +533,7 @@ public class GameManager : MonoBehaviour
         SpriteRenderer sr = frogInZone[zone].GetComponent<SpriteRenderer>();
         sr.sprite = frogDisabledSprite;
 
+        
         StartCoroutine(UnstunFrog(zone));
     }
 
@@ -706,6 +710,23 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    public void TogglePause()
+    {
+        if (isGameOver)
+        {
+            return;
+        }
+
+        if (isGamePaused)
+        {
+            OnResumeButton();
+        }
+        else
+        {
+            OnPauseButton();
+        }
+    }
+
     public void OnPauseButton()
     {
         Time.timeScale = 0;
@@ -727,6 +748,18 @@ public class GameManager : MonoBehaviour
     public void OnPlayButton()
     {
         ResetGame();
+    }
+
+    public void OnHelpClick()
+    {
+        pauseGameUI.SetActive(false);
+        helpUI.SetActive(true);
+    }
+
+    public void OnBackClick()
+    {
+        pauseGameUI.SetActive(true);
+        helpUI.SetActive(false);
     }
 
     void UpdateInfestationCount(int count)

@@ -5,14 +5,14 @@ public class BeetleEnemy : Enemy
 
     public float distance;
 
-    private float t = 0;
+    private float deltaTime = 0;
     private bool inRange = false;
     private bool inView = true;
     private SpriteRenderer sr;
 
     public BeetleEnemy()
     {
-        movement = 0.8f;
+        movement = 0.6f;
         hitsLeft = 2;
         type = Enemy.Type.BEETLE;
     }
@@ -36,27 +36,23 @@ public class BeetleEnemy : Enemy
                 {
                     inRange = true;
                     inView = false;
-                    t = 0;
+                    deltaTime = 0;
                 }
                 else
                 {
-                    t += Time.deltaTime;
-                    float alpha = 1 - Mathf.SmoothStep(0, 1, t);
+                    deltaTime += Time.deltaTime;
+                    float alpha = 1 - Mathf.SmoothStep(0, 1, deltaTime);
                     sr.color = new Color(1, 1, 1, alpha);
-
-                    SpriteRenderer plusSr = transform.Find("Plus").GetComponent<SpriteRenderer>();
-                    plusSr.color = new Color(1, 1, 1, alpha);
+                    healthBarSR.color = new Color(1, 1, 1, alpha);
                 }
             }
 
             if (!inView)
             {
-                t += Time.deltaTime;
-                float alpha = Mathf.SmoothStep(0, 1, t * 2.0f);
+                deltaTime += Time.deltaTime;
+                float alpha = Mathf.SmoothStep(0, 1, deltaTime * 2.0f);
                 sr.color = new Color(1, 1, 1, alpha);
-
-                SpriteRenderer plusSr = transform.Find("Plus").GetComponent<SpriteRenderer>();
-                plusSr.color = new Color(1, 1, 1, alpha);
+                healthBarSR.color = new Color(1, 1, 1, alpha);
 
                 if (alpha == 1.0f)
                 {

@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 
 public class Enemy : MonoBehaviour
 {
@@ -16,8 +17,11 @@ public class Enemy : MonoBehaviour
     public Enemy.Type type;
     public string zone;
     public int hitsLeft = 1;
-    public GameObject plus;
-    public Sprite plusSprite;
+
+    // For health bar
+    public GameObject healthBar;
+    public SpriteRenderer healthBarSR;
+    public Animator healthBarAnim;
 
     public enum Type
     {
@@ -68,21 +72,32 @@ public class Enemy : MonoBehaviour
         hitsLeft--;
         if (hitsLeft == 1)
         {
-            plus.SetActive(false);
+            healthBarAnim.speed = 1;
+            StartCoroutine(DestroyOnAnimationEnd(healthBar, healthBarAnim.runtimeAnimatorController.animationClips[0].length));
         }
         return hitsLeft <= 0;
     }
 
-    public void AddSprite(Sprite plusSprite)
+    public void AddHealthBar(GameObject prefab)
     {
-        // add the plus sprite
-        plus = new GameObject("Plus");
-        SpriteRenderer plusSr = plus.AddComponent<SpriteRenderer>();
-        plusSr.sprite = plusSprite;
+        healthBar = Instantiate(prefab);
+        SpriteRenderer plusSr = healthBar.GetComponent<SpriteRenderer>();
         plusSr.sortingLayerName = "Enemy";
-        plus.transform.parent = transform;
-        plus.transform.rotation = transform.rotation;
-        plus.transform.localPosition = new Vector3(0.4f, -0.6f, 0);
+        plusSr.sortingOrder = 2;
+
+        healthBar.transform.parent = transform;
+        healthBar.transform.rotation = Quaternion.identity;
+        healthBar.transform.localPosition = Vector3.zero;
+
+        healthBarSR = healthBar.GetComponent<SpriteRenderer>();
+        healthBarAnim = healthBar.GetComponent<Animator>();
+        healthBarAnim.speed = 0;
+    }
+
+    private IEnumerator DestroyOnAnimationEnd(GameObject gameObject, float length)
+    {
+        yield return new WaitForSeconds(length);
+        Object.Destroy(gameObject);
     }
 
 }

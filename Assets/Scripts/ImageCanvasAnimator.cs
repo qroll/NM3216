@@ -26,6 +26,7 @@ public class ImageCanvasAnimator : MonoBehaviour
 
         // set the controller
         animator.runtimeAnimatorController = controller;
+        animator.updateMode = AnimatorUpdateMode.UnscaledTime;
     }
 
     void Update()

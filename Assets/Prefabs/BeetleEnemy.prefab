@@ -90,15 +90,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isTrapped: 0
-  movement: 0.8
+  movement: 0.6
   angle: 0
   radius: 0.3
   pivot: {x: 0, y: 0, z: 0}
   type: 3
   zone: 
   hitsLeft: 2
-  plus: {fileID: 0}
-  plusSprite: {fileID: 0}
+  healthBar: {fileID: 0}
+  healthBarSR: {fileID: 0}
+  healthBarAnim: {fileID: 0}
   distance: 0
 --- !u!212 &212980956179206408
 SpriteRenderer:

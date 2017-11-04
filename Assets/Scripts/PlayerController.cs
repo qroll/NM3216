@@ -30,6 +30,10 @@ public class PlayerController : MonoBehaviour
         {
             gm.Swat("Right");
         }
+        if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.P))
+        {
+            gm.TogglePause();
+        }
     }
 
 }
