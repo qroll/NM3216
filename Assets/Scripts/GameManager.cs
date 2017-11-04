@@ -147,12 +147,23 @@ public class GameManager : MonoBehaviour
 
     void FirstTimeSetUp()
     {
+        // Screen.SetResolution(Screen.height, Screen.height, Screen.fullScreen);
+
         /*
         float s_baseOrthographicSize = Screen.height / 32.0f / 2.0f;
         Camera.main.orthographicSize = s_baseOrthographicSize;
         */
 
-        //Screen.SetResolution(Screen.height, Screen.height, Screen.fullScreen);
+        // Position the pause button at the top right corner of the game map
+        RectTransform canvas = inGameUI.GetComponent<RectTransform>();
+        RectTransform button = inGameUI.transform.Find("Button").GetComponent<RectTransform>();
+        float point = Camera.main.ViewportToWorldPoint(new Vector3(0, 0.95f, distFromCamera)).y;
+        Vector2 viewportPos = Camera.main.WorldToViewportPoint(new Vector2(point, point));
+        float x = (viewportPos.x * canvas.sizeDelta.x) - (canvas.sizeDelta.x * 0.5f);
+        float y = (viewportPos.y * canvas.sizeDelta.y) - (canvas.sizeDelta.y * 0.5f);
+        Vector2 rectTransformPos = new Vector2(x, y);
+
+        button.anchoredPosition = rectTransformPos;
 
         babyFrogAnimator = babyFrog.GetComponent<Animator>();
 
@@ -534,7 +545,7 @@ public class GameManager : MonoBehaviour
         SpriteRenderer sr = frogInZone[zone].GetComponent<SpriteRenderer>();
         sr.sprite = frogDisabledSprite;
 
-        
+
         StartCoroutine(UnstunFrog(zone));
     }
 

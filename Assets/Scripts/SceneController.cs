@@ -18,7 +18,7 @@ public class SceneController : MonoBehaviour
         Time.timeScale = 1.0f;
         loadingText.enabled = false;
 
-        //Screen.SetResolution(Screen.width, Screen.height, true);
+        // Screen.SetResolution(Screen.height, Screen.height, Screen.fullScreen);
     }
 
     // Update is called once per frame
