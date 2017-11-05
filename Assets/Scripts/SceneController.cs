@@ -10,19 +10,13 @@ public class SceneController : MonoBehaviour
     public GameObject helpUI;
     public GameObject mainUI;
 
-    public AudioSource menuMusic;
-
     private bool loading;
-    private float currentVol;
-    private float deltaTime = 0;
 
     // Use this for initialization
     void Start()
     {
         Time.timeScale = 1.0f;
         loadingText.enabled = false;
-
-        currentVol = menuMusic.volume;
 
         // Screen.SetResolution(Screen.height, Screen.height, Screen.fullScreen);
     }
@@ -32,8 +26,6 @@ public class SceneController : MonoBehaviour
     {
         if (loading)
         {
-            menuMusic.volume = Mathf.Lerp(currentVol, 0, deltaTime/2.0f);
-            deltaTime += Time.deltaTime;
             loadingText.color = new Color(loadingText.color.r, loadingText.color.g, loadingText.color.b, Mathf.PingPong(Time.time, 1));
         }
     }
@@ -47,7 +39,7 @@ public class SceneController : MonoBehaviour
         operation.allowSceneActivation = false;
 
         //Wait until the last operation fully loads to return anything
-        while (operation.progress < 0.9f || menuMusic.volume > 0f)
+        while (operation.progress < 0.9f)
         {
             yield return null;
         }
