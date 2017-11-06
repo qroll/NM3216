@@ -23,6 +23,8 @@ public class GameManager : MonoBehaviour
     public float stunTime = 1.0f;
     [Tooltip("Starting unlocked enemies")]
     public Enemy.Type initialEnemyType = Enemy.Type.FLY;
+    [Tooltip("Turn on moderated difficulty mode")]
+    public bool moderateDifficultyMode = true;
 
     // controls the frequency of spawning
     [Tooltip("Change in frequency on success")]
@@ -101,6 +103,9 @@ public class GameManager : MonoBehaviour
     private int killCount = 0;
     private int successCount = 0;
 
+    private int fixedModifierCount = 0;
+    private int modifierCount = 0;
+
     // Spawn rates per enemy during the game
     private Dictionary<Enemy.Type, float> currSpawnRatePerEnemy;
     private Dictionary<Enemy.Type, float> currSpawnNumPerEnemy;
@@ -132,6 +137,24 @@ public class GameManager : MonoBehaviour
         { Enemy.Type.LADYBUG, x => 5 / Mathf.Pow(Mathf.Pow(5 / 0.8f, 1 / 11.0f), x) },
         { Enemy.Type.BEETLE, x => 7 / Mathf.Pow(Mathf.Pow(7 / 2.0f, 1 / 11.0f), x) },
         { Enemy.Type.FIREFLY, x => 10 / Mathf.Pow(Mathf.Pow(10 / 4.2f, 1 / 11.0f), x) }
+    };
+
+    private static Dictionary<Enemy.Type, System.Func<int, float, float>> modSpawnRateFormula = new Dictionary<Enemy.Type, System.Func<int, float, float>>()
+    {
+        { Enemy.Type.FLY, (x, modifier) => 3 / Mathf.Pow(Mathf.Pow(3 / 0.8f + modifier, 1 / 11.0f), x) },
+        { Enemy.Type.BEE, (x, modifier) => 7 / Mathf.Pow(Mathf.Pow(7 / 2.0f + modifier, 1 / 11.0f), x) },
+        { Enemy.Type.LADYBUG, (x, modifier) => 5 / Mathf.Pow(Mathf.Pow(5 / 0.8f + modifier, 1 / 11.0f), x) },
+        { Enemy.Type.BEETLE, (x, modifier) => 7 / Mathf.Pow(Mathf.Pow(7 / 2.0f + modifier, 1 / 11.0f), x) },
+        { Enemy.Type.FIREFLY, (x, modifier) => 10 / Mathf.Pow(Mathf.Pow(10 / 4.2f + modifier, 1 / 11.0f), x) }
+    };
+
+    private static Dictionary<Enemy.Type, System.Func<int, float>> modFormula = new Dictionary<Enemy.Type, System.Func<int, float>>()
+    {
+        { Enemy.Type.FLY, x => 0.0f },
+        { Enemy.Type.BEE, x => 3 / (1 + Mathf.Exp(Mathf.Log(9) * (-x / 0.4f + 1.5f))) },
+        { Enemy.Type.LADYBUG, x => 0.0f },
+        { Enemy.Type.BEETLE, x => 3 / (1 + Mathf.Exp(Mathf.Log(9) * (-x / 0.4f + 1.5f))) },
+        { Enemy.Type.FIREFLY, x => 3 / (1 + Mathf.Exp(Mathf.Log(9) * (-x / 0.4f + 1.5f))) }
     };
 
     // Use this for initialization
@@ -219,6 +242,9 @@ public class GameManager : MonoBehaviour
         lastSuccessTimeDelta = 0;
         killCount = 0;
         successCount = 0;
+
+        fixedModifierCount = 0;
+        modifierCount = 0;
 
         currSpawnRatePerEnemy = new Dictionary<Enemy.Type, float>(initialSpawnRatePerEnemy);
         currSpawnNumPerEnemy = new Dictionary<Enemy.Type, float>(initialSpawnNumPerEnemy);
@@ -545,6 +571,10 @@ public class GameManager : MonoBehaviour
         SpriteRenderer sr = frogInZone[zone].GetComponent<SpriteRenderer>();
         sr.sprite = frogDisabledSprite;
 
+        if (infestationCount == 2)
+        {
+            modifierCount++;
+        }
 
         StartCoroutine(UnstunFrog(zone));
     }
@@ -613,7 +643,15 @@ public class GameManager : MonoBehaviour
             successCount++;
             if (successCount < nextSuccessCount)
             {
-                currSpawnRatePerEnemy[currHighestEnemyType] = spawnRateFormula[currHighestEnemyType](successCount);
+                if (moderateDifficultyMode)
+                {
+                    currSpawnRatePerEnemy[currHighestEnemyType] = modSpawnRateFormula[currHighestEnemyType](successCount, modFormula[currHighestEnemyType](fixedModifierCount));
+                }
+                else
+                {
+                    currSpawnRatePerEnemy[currHighestEnemyType] = spawnRateFormula[currHighestEnemyType](successCount);
+                }
+                
                 CDebug.Log(CDebug.EDebugLevel.TRACE, string.Format("Type={0} | increased success count={1} | spawn rate={2}", currHighestEnemyType, successCount, currSpawnRatePerEnemy[currHighestEnemyType]));
             }
             else if (successCount >= nextSuccessCount && currHighestEnemyType < Enemy.Type.MAX)
@@ -623,6 +661,15 @@ public class GameManager : MonoBehaviour
                 if (currHighestEnemyType < Enemy.Type.MAX)
                 {
                     lastIncreasedPerEnemy[currHighestEnemyType] = Time.time;
+                    
+                    if (moderateDifficultyMode)
+                    {
+                        fixedModifierCount = modifierCount;
+                        modifierCount = 0;
+                        CDebug.Log(CDebug.EDebugLevel.TRACE, string.Format("Modifier={0}", fixedModifierCount));
+                    }
+
+                    // display new enemy warning
                     newEnemyWarning.SetActive(true);
                     StartCoroutine(ClearWaveWarning());
                 }
@@ -703,6 +750,9 @@ public class GameManager : MonoBehaviour
         string zone = control.zone;
         infestationZones[zone].Enqueue(obj);
         UpdateInfestationCount(infestationCount + 1);
+
+        // reset the success scenario
+        lastSuccessTimeDelta = 0;
 
         if (infestationCount >= maxNumEnemies)
         {

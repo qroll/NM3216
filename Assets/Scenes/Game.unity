@@ -6871,7 +6871,7 @@ MonoBehaviour:
   nextSuccessCount: 12
   maxNumEnemies: 3
   stunTime: 1
-  initialEnemyType: 4
+  initialEnemyType: 0
   deltaSpawnRate: 0.02
   minSpawnRate: 0.1
   deltaSpawnNum: 0.1

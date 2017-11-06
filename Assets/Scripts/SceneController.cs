@@ -9,6 +9,7 @@ public class SceneController : MonoBehaviour
     public Text loadingText;
     public GameObject helpUI;
     public GameObject mainUI;
+    public GameObject creditsUI;
 
     private bool loading;
 
@@ -57,12 +58,21 @@ public class SceneController : MonoBehaviour
     {
         helpUI.SetActive(true);
         mainUI.SetActive(false);
+        creditsUI.SetActive(false);
     }
 
     public void OnMainClick()
     {
         helpUI.SetActive(false);
         mainUI.SetActive(true);
+        creditsUI.SetActive(false);
+    }
+
+    public void OnCreditsClick()
+    {
+        helpUI.SetActive(false);
+        mainUI.SetActive(false);
+        creditsUI.SetActive(true);
     }
 
     public void QuitGame()
