@@ -727,11 +727,11 @@ public class GameManager : MonoBehaviour
             return;
         }
 
-        if (isGamePaused)
+        if (isGamePaused && pauseGameUI.activeInHierarchy)
         {
             OnResumeButton();
         }
-        else
+        else if (!isGamePaused && inGameUI.activeInHierarchy)
         {
             OnPauseButton();
         }

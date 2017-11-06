@@ -17,8 +17,12 @@ public class GameSceneController : MonoBehaviour
             }
         }
 
-        MenuMusic script = menuMusic.GetComponent<MenuMusic>();
-        script.Fade();
+        if (menuMusic != null)
+        {
+            MenuMusic script = menuMusic.GetComponent<MenuMusic>();
+            script.Fade();
+        }
+        
     }
 
     public void OnMainMenuClick()

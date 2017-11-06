@@ -29,6 +29,8 @@ public class Enemy : MonoBehaviour
     private Vector3 targetPos, originalPos;
     private Vector3 targetRot, originalRot;
 
+    protected const float PPU_SCALE = 512 / 100.0f;
+
     public enum Type
     {
         FLY, LADYBUG, BEE, BEETLE, FIREFLY, MAX
@@ -99,7 +101,7 @@ public class Enemy : MonoBehaviour
 
     public virtual void Move()
     {
-        Vector3 translation = movement * (512 / 100) * new Vector3(0, -1, 0) * Time.deltaTime;
+        Vector3 translation = movement * PPU_SCALE * new Vector3(0, -1, 0) * Time.deltaTime;
         transform.Translate(translation);
     }
 

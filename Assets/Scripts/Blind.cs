@@ -6,7 +6,7 @@ public class Blind : MonoBehaviour
     private float elapsedTime = 0.0f;
     private float fadeTime = 0.0f;
 
-    private const float DURATION = 1.0f;
+    private const float DURATION = 1.5f;
     private const float FADE_DURATION = 2.0f;
 
     // Use this for initialization
