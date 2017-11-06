@@ -141,11 +141,11 @@ public class GameManager : MonoBehaviour
 
     private static Dictionary<Enemy.Type, System.Func<int, float, float>> modSpawnRateFormula = new Dictionary<Enemy.Type, System.Func<int, float, float>>()
     {
-        { Enemy.Type.FLY, (x, modifier) => 3 / Mathf.Pow(Mathf.Pow(3 / 0.8f + modifier, 1 / 11.0f), x) },
-        { Enemy.Type.BEE, (x, modifier) => 7 / Mathf.Pow(Mathf.Pow(7 / 2.0f + modifier, 1 / 11.0f), x) },
-        { Enemy.Type.LADYBUG, (x, modifier) => 5 / Mathf.Pow(Mathf.Pow(5 / 0.8f + modifier, 1 / 11.0f), x) },
-        { Enemy.Type.BEETLE, (x, modifier) => 7 / Mathf.Pow(Mathf.Pow(7 / 2.0f + modifier, 1 / 11.0f), x) },
-        { Enemy.Type.FIREFLY, (x, modifier) => 10 / Mathf.Pow(Mathf.Pow(10 / 4.2f + modifier, 1 / 11.0f), x) }
+        { Enemy.Type.FLY, (x, modifier) => 3 / Mathf.Pow(Mathf.Pow(3 / (0.8f + modifier), 1 / 11.0f), x) },
+        { Enemy.Type.BEE, (x, modifier) => 7 / Mathf.Pow(Mathf.Pow(7 / (2.0f + modifier), 1 / 11.0f), x) },
+        { Enemy.Type.LADYBUG, (x, modifier) => 5 / Mathf.Pow(Mathf.Pow(5 / (0.8f + modifier), 1 / 11.0f), x) },
+        { Enemy.Type.BEETLE, (x, modifier) => 7 / Mathf.Pow(Mathf.Pow(7 / (2.0f + modifier), 1 / 11.0f), x) },
+        { Enemy.Type.FIREFLY, (x, modifier) => 10 / Mathf.Pow(Mathf.Pow(10 / (4.2f + modifier), 1 / 11.0f), x) }
     };
 
     private static Dictionary<Enemy.Type, System.Func<int, float>> modFormula = new Dictionary<Enemy.Type, System.Func<int, float>>()
