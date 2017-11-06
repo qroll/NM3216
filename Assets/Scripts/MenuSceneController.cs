@@ -3,17 +3,16 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-public class SceneController : MonoBehaviour
+public class MenuSceneController : MonoBehaviour
 {
 
     public Text loadingText;
-    public GameObject helpUI;
     public GameObject mainUI;
+    public GameObject helpUI;
     public GameObject creditsUI;
 
     private bool loading;
 
-    // Use this for initialization
     void Start()
     {
         Time.timeScale = 1.0f;
@@ -22,7 +21,6 @@ public class SceneController : MonoBehaviour
         // Screen.SetResolution(Screen.height, Screen.height, Screen.fullScreen);
     }
 
-    // Update is called once per frame
     void Update()
     {
         if (loading)
@@ -34,12 +32,10 @@ public class SceneController : MonoBehaviour
     IEnumerator LoadGame()
     {
         loading = true;
-        // yield return new WaitForSeconds(3);
 
         AsyncOperation operation = SceneManager.LoadSceneAsync("Game", LoadSceneMode.Single);
         operation.allowSceneActivation = false;
 
-        //Wait until the last operation fully loads to return anything
         while (operation.progress < 0.9f)
         {
             yield return null;

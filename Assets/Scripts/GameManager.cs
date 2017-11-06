@@ -177,17 +177,6 @@ public class GameManager : MonoBehaviour
         Camera.main.orthographicSize = s_baseOrthographicSize;
         */
 
-        // Position the pause button at the top right corner of the game map
-        RectTransform canvas = inGameUI.GetComponent<RectTransform>();
-        RectTransform button = inGameUI.transform.Find("Button").GetComponent<RectTransform>();
-        float point = Camera.main.ViewportToWorldPoint(new Vector3(0, 0.95f, distFromCamera)).y;
-        Vector2 viewportPos = Camera.main.WorldToViewportPoint(new Vector2(point, point));
-        float x = (viewportPos.x * canvas.sizeDelta.x) - (canvas.sizeDelta.x * 0.5f);
-        float y = (viewportPos.y * canvas.sizeDelta.y) - (canvas.sizeDelta.y * 0.5f);
-        Vector2 rectTransformPos = new Vector2(x, y);
-
-        button.anchoredPosition = rectTransformPos;
-
         babyFrogAnimator = babyFrog.GetComponent<Animator>();
 
         frogInZone.Add("Up", upFrog);
@@ -796,6 +785,11 @@ public class GameManager : MonoBehaviour
         inGameUI.SetActive(false);
     }
 
+    public void OnMuteButton()
+    {
+        MusicManager.Instance.ToggleMute();
+    }
+
     public void OnResumeButton()
     {
         Time.timeScale = 1.0f;
@@ -828,5 +822,5 @@ public class GameManager : MonoBehaviour
         infestationCount = count;
         babyFrogAnimator.SetInteger("count", infestationCount);
     }
-
+    
 }

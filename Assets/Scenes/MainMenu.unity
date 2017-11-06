@@ -327,7 +327,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1072778899}
+      - m_Target: {fileID: 2075636810}
         m_MethodName: OnMainClick
         m_Mode: 1
         m_Arguments:
@@ -564,7 +564,7 @@ RectTransform:
   - {fileID: 1874717955}
   - {fileID: 787061886}
   m_Father: {fileID: 0}
-  m_RootOrder: 1
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -1159,7 +1159,7 @@ GameObject:
   - component: {fileID: 547940280}
   - component: {fileID: 547940279}
   m_Layer: 5
-  m_Name: grass_2_mirror
+  m_Name: grass-mirror
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1227,7 +1227,7 @@ GameObject:
   - component: {fileID: 565668394}
   - component: {fileID: 565668393}
   m_Layer: 5
-  m_Name: grass_1
+  m_Name: grass
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1360,7 +1360,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1072778899}
+      - m_Target: {fileID: 2075636810}
         m_MethodName: OnHelpClick
         m_Mode: 1
         m_Arguments:
@@ -1462,7 +1462,7 @@ Prefab:
     - target: {fileID: 224634313740332234, guid: d783c714d5bafeb4980ec5e519e943f4,
         type: 2}
       propertyPath: m_RootOrder
-      value: 2
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 224634313740332234, guid: d783c714d5bafeb4980ec5e519e943f4,
         type: 2}
@@ -1518,7 +1518,7 @@ Prefab:
         type: 2}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 1072778899}
+      objectReference: {fileID: 2075636810}
     - target: {fileID: 114269535613205694, guid: d783c714d5bafeb4980ec5e519e943f4,
         type: 2}
       propertyPath: m_UiScaleMode
@@ -1597,6 +1597,11 @@ Prefab:
         type: 2}
       propertyPath: m_Color.b
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114703637135379966, guid: d783c714d5bafeb4980ec5e519e943f4,
+        type: 2}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: OnMainClick
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: d783c714d5bafeb4980ec5e519e943f4, type: 2}
@@ -1680,7 +1685,7 @@ GameObject:
   - component: {fileID: 654800187}
   - component: {fileID: 654800186}
   m_Layer: 5
-  m_Name: grass_1_mirror
+  m_Name: grass-mirror
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2009,7 +2014,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1072778899}
+      - m_Target: {fileID: 2075636810}
         m_MethodName: OnPlayClick
         m_Mode: 1
         m_Arguments:
@@ -2142,7 +2147,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1072778899}
+      - m_Target: {fileID: 2075636810}
         m_MethodName: QuitGame
         m_Mode: 1
         m_Arguments:
@@ -2294,7 +2299,7 @@ GameObject:
   - component: {fileID: 976568439}
   - component: {fileID: 976568438}
   m_Layer: 5
-  m_Name: grass_2
+  m_Name: grass
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2363,7 +2368,6 @@ GameObject:
   - component: {fileID: 1072778896}
   - component: {fileID: 1072778895}
   - component: {fileID: 1072778894}
-  - component: {fileID: 1072778899}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -2441,21 +2445,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1072778899
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1072778893}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b9380536be4e06e498a52b182cab8c09, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  loadingText: {fileID: 1438336905}
-  helpUI: {fileID: 1606673310}
-  mainUI: {fileID: 261371427}
-  creditsUI: {fileID: 1860953517}
 --- !u!1 &1102180779
 GameObject:
   m_ObjectHideFlags: 0
@@ -2706,7 +2695,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1190331339
 MonoBehaviour:
@@ -2716,9 +2705,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 1190331336}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c14452e58633eba4c95f2a9a7d72c2cc, type: 3}
+  m_Script: {fileID: 11500000, guid: be8a67f3d6f22974fa5c6b7a5e3a44d1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isEnabled: 1
 --- !u!1 &1317324210
 GameObject:
   m_ObjectHideFlags: 0
@@ -2779,7 +2769,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1361203283
 GameObject:
@@ -3165,7 +3155,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1072778899}
+      - m_Target: {fileID: 2075636810}
         m_MethodName: OnCreditsClick
         m_Mode: 1
         m_Arguments:
@@ -3451,7 +3441,7 @@ RectTransform:
   - {fileID: 2142975784}
   - {fileID: 107212637}
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -3614,6 +3604,50 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 2005291915}
+--- !u!1 &2075636808
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 2075636809}
+  - component: {fileID: 2075636810}
+  m_Layer: 0
+  m_Name: MainMenuManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2075636809
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 2075636808}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2075636810
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 2075636808}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b9380536be4e06e498a52b182cab8c09, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  loadingText: {fileID: 1438336905}
+  mainUI: {fileID: 261371427}
+  helpUI: {fileID: 1606673310}
+  creditsUI: {fileID: 1860953517}
 --- !u!1 &2142975783
 GameObject:
   m_ObjectHideFlags: 0
