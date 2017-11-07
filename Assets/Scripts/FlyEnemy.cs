@@ -2,6 +2,7 @@
 
 public class FlyEnemy : Enemy
 {
+
     // For fly movement
     public Vector3 m_centerPosition;
     public float m_degrees = 0;
@@ -22,8 +23,15 @@ public class FlyEnemy : Enemy
 
         float x = m_period * Mathf.Sin(m_degrees);
         transform.localPosition = new Vector3(x, transform.localPosition.y, transform.localPosition.z);
-
+        
         m_degrees += deltaTime;
+    }
+
+    // Fix position jump at the beginning
+    public void ForceMove(float deltaTime)
+    {
+        m_degrees += deltaTime;
+        Move();
     }
 
 }

@@ -2147,7 +2147,7 @@ Prefab:
     - target: {fileID: 224634313740332234, guid: d783c714d5bafeb4980ec5e519e943f4,
         type: 2}
       propertyPath: m_RootOrder
-      value: 11
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 224634313740332234, guid: d783c714d5bafeb4980ec5e519e943f4,
         type: 2}
@@ -7099,7 +7099,8 @@ MonoBehaviour:
   maxNumEnemies: 3
   stunTime: 1
   initialEnemyType: 0
-  moderateDifficultyMode: 1
+  moderateDifficulty: 1
+  successScenario: 1
   deltaSpawnRate: 0.02
   minSpawnRate: 0.1
   deltaSpawnNum: 0.1
@@ -7249,7 +7250,7 @@ RectTransform:
   - {fileID: 169229623}
   - {fileID: 252311745}
   m_Father: {fileID: 0}
-  m_RootOrder: 10
+  m_RootOrder: 11
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}

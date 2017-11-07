@@ -2,6 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum SuccessScenario
+{
+    NO_MISS, ONE_INSECT_ONE_MISS
+}
+
 public class GameManager : MonoBehaviour
 {
 
@@ -24,11 +29,13 @@ public class GameManager : MonoBehaviour
     [Tooltip("Starting unlocked enemies")]
     public Enemy.Type initialEnemyType = Enemy.Type.FLY;
     [Tooltip("Turn on moderated difficulty mode")]
-    public bool moderateDifficultyMode = true;
+    public bool moderateDifficulty = true;
+    [Tooltip("Set success based on this scenario")]
+    public SuccessScenario successScenario = SuccessScenario.ONE_INSECT_ONE_MISS;
 
     // controls the frequency of spawning
     [Tooltip("Change in frequency on success")]
-    public float deltaSpawnRate = 1.0f;
+    public float deltaSpawnRate = 0.02f;
     [Tooltip("Min frequency")]
     public float minSpawnRate = 0.1f;
 
@@ -139,22 +146,22 @@ public class GameManager : MonoBehaviour
         { Enemy.Type.FIREFLY, x => 10 / Mathf.Pow(Mathf.Pow(10 / 4.2f, 1 / 11.0f), x) }
     };
 
-    private static Dictionary<Enemy.Type, System.Func<int, float, float>> modSpawnRateFormula = new Dictionary<Enemy.Type, System.Func<int, float, float>>()
+    private static Dictionary<Enemy.Type, System.Func<int, float, float>> moderatedSpawnRateFormula = new Dictionary<Enemy.Type, System.Func<int, float, float>>()
     {
-        { Enemy.Type.FLY, (x, modifier) => 3 / Mathf.Pow(Mathf.Pow(3 / (0.8f + modifier), 1 / 11.0f), x) },
-        { Enemy.Type.BEE, (x, modifier) => 7 / Mathf.Pow(Mathf.Pow(7 / (2.0f + modifier), 1 / 11.0f), x) },
-        { Enemy.Type.LADYBUG, (x, modifier) => 5 / Mathf.Pow(Mathf.Pow(5 / (0.8f + modifier), 1 / 11.0f), x) },
-        { Enemy.Type.BEETLE, (x, modifier) => 7 / Mathf.Pow(Mathf.Pow(7 / (2.0f + modifier), 1 / 11.0f), x) },
-        { Enemy.Type.FIREFLY, (x, modifier) => 10 / Mathf.Pow(Mathf.Pow(10 / (4.2f + modifier), 1 / 11.0f), x) }
+        { Enemy.Type.FLY, (x, modifier) => 3 / Mathf.Pow(Mathf.Pow(3 / (0.8f - modifier), 1 / 11.0f), x) },
+        { Enemy.Type.BEE, (x, modifier) => 7 / Mathf.Pow(Mathf.Pow(7 / (5.0f - modifier), 1 / 11.0f), x) },
+        { Enemy.Type.LADYBUG, (x, modifier) => 5 / Mathf.Pow(Mathf.Pow(5 / (4.0f - modifier), 1 / 11.0f), x) },
+        { Enemy.Type.BEETLE, (x, modifier) => 7 / Mathf.Pow(Mathf.Pow(7 / (5.0f - modifier), 1 / 11.0f), x) },
+        { Enemy.Type.FIREFLY, (x, modifier) => 10 / Mathf.Pow(Mathf.Pow(10 / (7.0f - modifier), 1 / 11.0f), x) }
     };
 
-    private static Dictionary<Enemy.Type, System.Func<int, float>> modFormula = new Dictionary<Enemy.Type, System.Func<int, float>>()
+    private static Dictionary<Enemy.Type, System.Func<int, float>> modifierFormula = new Dictionary<Enemy.Type, System.Func<int, float>>()
     {
         { Enemy.Type.FLY, x => 0.0f },
-        { Enemy.Type.BEE, x => 3 / (1 + Mathf.Exp(Mathf.Log(9) * (-x / 0.4f + 1.5f))) },
-        { Enemy.Type.LADYBUG, x => 0.0f },
-        { Enemy.Type.BEETLE, x => 3 / (1 + Mathf.Exp(Mathf.Log(9) * (-x / 0.4f + 1.5f))) },
-        { Enemy.Type.FIREFLY, x => 3 / (1 + Mathf.Exp(Mathf.Log(9) * (-x / 0.4f + 1.5f))) }
+        { Enemy.Type.BEE, x => Mathf.Ceil(3 - 3 / (1 + Mathf.Exp(0.5f * Mathf.Log(9) * (3 - x)))) },
+        { Enemy.Type.LADYBUG, x => Mathf.Ceil(3 - 3 / (1 + Mathf.Exp(0.5f * Mathf.Log(9) * (3 - x)))) },
+        { Enemy.Type.BEETLE, x => Mathf.Ceil(3 - 3 / (1 + Mathf.Exp(0.5f * Mathf.Log(9) * (3 - x)))) },
+        { Enemy.Type.FIREFLY, x => Mathf.Ceil(3 - 3 / (1 + Mathf.Exp(0.5f * Mathf.Log(9) * (3 - x)))) }
     };
 
     // Use this for initialization
@@ -368,8 +375,12 @@ public class GameManager : MonoBehaviour
         {
             case Enemy.Type.FLY:
                 ((FlyEnemy)enemyScript).m_centerPosition = position;
+                ((FlyEnemy)enemyScript).ForceMove(Time.deltaTime);
                 break;
             case Enemy.Type.BEE:
+                Vector3 midPt = Camera.main.ViewportToWorldPoint(new Vector3(0.5f, 0.2f, distFromCamera));
+                float distance = midPt.magnitude;
+                ((BeeEnemy)enemyScript).distance = distance;
                 break;
             case Enemy.Type.LADYBUG:
                 enemyScript.AddHealthBar(bubblePrefab);
@@ -415,7 +426,8 @@ public class GameManager : MonoBehaviour
     // Returns the rotation needed for a game object to face the origin
     Quaternion GenerateRotation(Vector3 position)
     {
-        Vector3 direction = -position;
+        // Force the angle slightly inwards to avoid the borders
+        Vector3 direction = Vector3.up - position;
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg + 90;
         Quaternion rotation = Quaternion.AngleAxis(angle, Vector3.forward);
 
@@ -479,7 +491,9 @@ public class GameManager : MonoBehaviour
             StunFrog(zone);
             // reset the kill count on a missed hit
             killCount = 0;
-            lastSuccessTimeDelta = 0;
+            // update success timer on a missed hit
+            UpdateSuccessTimer();
+            UpdateModifier();
         }
     }
 
@@ -560,11 +574,6 @@ public class GameManager : MonoBehaviour
         SpriteRenderer sr = frogInZone[zone].GetComponent<SpriteRenderer>();
         sr.sprite = frogDisabledSprite;
 
-        if (infestationCount == 2)
-        {
-            modifierCount++;
-        }
-
         StartCoroutine(UnstunFrog(zone));
     }
 
@@ -632,9 +641,9 @@ public class GameManager : MonoBehaviour
             successCount++;
             if (successCount < nextSuccessCount)
             {
-                if (moderateDifficultyMode)
+                if (moderateDifficulty)
                 {
-                    currSpawnRatePerEnemy[currHighestEnemyType] = modSpawnRateFormula[currHighestEnemyType](successCount, modFormula[currHighestEnemyType](fixedModifierCount));
+                    currSpawnRatePerEnemy[currHighestEnemyType] = moderatedSpawnRateFormula[currHighestEnemyType](successCount, modifierFormula[currHighestEnemyType](fixedModifierCount));
                 }
                 else
                 {
@@ -651,7 +660,7 @@ public class GameManager : MonoBehaviour
                 {
                     lastIncreasedPerEnemy[currHighestEnemyType] = Time.time;
                     
-                    if (moderateDifficultyMode)
+                    if (moderateDifficulty)
                     {
                         fixedModifierCount = modifierCount;
                         modifierCount = 0;
@@ -665,6 +674,32 @@ public class GameManager : MonoBehaviour
 
                 CDebug.Log(CDebug.EDebugLevel.TRACE, string.Format("Unlocked enemy={0}", currHighestEnemyType));
             }
+        }
+    }
+    
+    void UpdateSuccessTimer()
+    {
+        if (successScenario == SuccessScenario.NO_MISS)
+        {
+            CDebug.Log(CDebug.EDebugLevel.TRACE, string.Format("Restart success timer"));
+            lastSuccessTimeDelta = 0;
+        }
+        else if (successScenario == SuccessScenario.ONE_INSECT_ONE_MISS)
+        {
+            if (infestationCount > 0)
+            {
+                CDebug.Log(CDebug.EDebugLevel.TRACE, string.Format("Restart success timer"));
+                lastSuccessTimeDelta = 0;
+            }
+        }
+    }
+
+    void UpdateModifier()
+    {
+        if (infestationCount == 2)
+        {
+            modifierCount++;
+            CDebug.Log(CDebug.EDebugLevel.TRACE, string.Format("Modifier={0}", modifierCount));
         }
     }
 
@@ -739,9 +774,6 @@ public class GameManager : MonoBehaviour
         string zone = control.zone;
         infestationZones[zone].Enqueue(obj);
         UpdateInfestationCount(infestationCount + 1);
-
-        // reset the success scenario
-        lastSuccessTimeDelta = 0;
 
         if (infestationCount >= maxNumEnemies)
         {
