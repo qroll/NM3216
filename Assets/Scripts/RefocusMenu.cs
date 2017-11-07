@@ -1,8 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.UI;
 
-public class MenuController : MonoBehaviour
+public class RefocusMenu : MonoBehaviour
 {
 
     public GameObject button;

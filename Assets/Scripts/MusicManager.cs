@@ -4,26 +4,20 @@ using UnityEngine;
 public class MusicManager : MonoBehaviour, IObservable
 {
 
+    [Tooltip("Global music setting. If disabled, music does not play at all. Useful for recording sound without music.")]
     public bool isEnabled = true;
-
-    private AudioSource menuMusic;
-    private  bool isMuted;
-    /*
-    private float maxVolume;
-    private float currentVolume;
-    private float deltaTime;
-    private Coroutine coroutine;
-    */
-    private IList<IObserver> observers = new List<IObserver>();
-
+    
     private static MusicManager _instance;
 
-    private const float FADE_TIME = 1.5f;
+    private AudioSource menuMusic;
+    private IList<IObserver> observers = new List<IObserver>();
 
     private MusicManager()
     {
 
     }
+
+    public bool isMuted { get; private set; }
 
     public static MusicManager Instance
     {
@@ -45,7 +39,6 @@ public class MusicManager : MonoBehaviour, IObservable
             _instance = this;
             DontDestroyOnLoad(this);
             menuMusic = GetComponent<AudioSource>();
-            // maxVolume = menuMusic.volume;
 
             if (!isEnabled)
             {
@@ -71,14 +64,6 @@ public class MusicManager : MonoBehaviour, IObservable
 
         if (Input.GetKeyDown(KeyCode.M))
         {
-            /*
-            if (coroutine != null)
-            {
-                StopCoroutine(coroutine);
-                currentVolume = menuMusic.volume;
-            }
-            */
-
             ToggleMute();
         }
     }
@@ -92,25 +77,23 @@ public class MusicManager : MonoBehaviour, IObservable
 
         if (isMuted)
         {
-            FadeIn();
+            Mute();
         }
         else
         {
-            FadeOut();
+            Unmute();
         }
     }
 
-    void FadeIn()
+    void Mute()
     {
-        // coroutine = StartCoroutine(FadeMenuMusic(currentVolume, maxVolume));
         ToggleMenuMusic(false);
         isMuted = false;
         NotifyAll(EventType.UNMUTE);
     }
 
-    void FadeOut()
+    void Unmute()
     {
-        // coroutine = StartCoroutine(FadeMenuMusic(currentVolume, 0.0f));
         ToggleMenuMusic(true);
         isMuted = true;
         NotifyAll(EventType.MUTE);
@@ -128,35 +111,18 @@ public class MusicManager : MonoBehaviour, IObservable
         }
     }
 
-    // Appears to be causing race conditions, resulting in music being forcefully
-    // replayed from the beginning
-    /*
-    IEnumerator FadeMenuMusic(float startVolume, float endVolume)
-    {
-        deltaTime = 0;
-
-        if (endVolume > 0.0f)
-        {
-            menuMusic.UnPause();
-        }
-
-        while (!Mathf.Approximately(menuMusic.volume, endVolume))
-        {
-            menuMusic.volume = Mathf.SmoothStep(startVolume, endVolume, deltaTime / FADE_TIME);
-            deltaTime += Time.deltaTime;
-            yield return null;
-        }
-
-        if (Mathf.Approximately(menuMusic.volume, 0.0f))
-        {
-            menuMusic.Pause();
-        }
-    }
-    */
+    /********************************************
+     * Implementation of the Observer interface *
+     ********************************************/
 
     public void Subscribe(IObserver observer)
     {
         observers.Add(observer);
+    }
+
+    public void Unsubscribe(IObserver observer)
+    {
+        observers.Remove(observer);
     }
 
     public void NotifyAll(EventType e)

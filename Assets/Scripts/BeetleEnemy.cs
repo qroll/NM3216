@@ -17,7 +17,7 @@ public class BeetleEnemy : Enemy
 
     public BeetleEnemy()
     {
-        movement = 0.6f;
+        movement = 0.4f;
         hitsLeft = 2;
         type = Enemy.Type.BEETLE;
     }

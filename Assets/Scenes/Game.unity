@@ -1313,8 +1313,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 682426a77d2195046a4466180591f84a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cross: {fileID: 851327063}
   distFromCamera: 10
+  cross: {fileID: 851327063}
 --- !u!1 &317158384
 GameObject:
   m_ObjectHideFlags: 0

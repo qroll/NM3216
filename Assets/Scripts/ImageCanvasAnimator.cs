@@ -1,19 +1,21 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
+/*
+ * Reuse sprite animation for animated image in UI canvas
+ * Credit: Boia Games
+ * http://boiagames.blogspot.sg/2015/08/reusing-your-unity-in-game-animations.html
+ */
+
 public class ImageCanvasAnimator : MonoBehaviour
 {
 
-    // set the controller you want to use in the inspector
+    [Tooltip("The animator controller to be used")]
     public RuntimeAnimatorController controller;
 
-    // the UI/Image component
     Image imageCanvas;
-    // the fake SpriteRenderer
     SpriteRenderer fakeRenderer;
-    // the Animator
     Animator animator;
-
 
     void Start()
     {
