@@ -39,7 +39,7 @@ public class BeeEnemy : Enemy
 
     IEnumerator SpeedUp()
     {
-        yield return new WaitForSeconds(Random.Range(0.5f, 0.8f));
+        yield return new WaitForSeconds(0.2f);
         isPaused = false;
         movement = 2.0f;
     }

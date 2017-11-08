@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class MusicManager : MonoBehaviour, IObservable
@@ -11,13 +12,17 @@ public class MusicManager : MonoBehaviour, IObservable
 
     private AudioSource menuMusic;
     private IList<IObserver> observers = new List<IObserver>();
+    private float deltaTime;
+    private Coroutine coroutine;
+
+    private const float GAME_OVER_FADE_OUT_TIME = 2.0f;
 
     private MusicManager()
     {
 
     }
 
-    public bool isMuted { get; private set; }
+    public bool isMuted { get { return menuMusic.mute; } }
 
     public static MusicManager Instance
     {
@@ -77,38 +82,57 @@ public class MusicManager : MonoBehaviour, IObservable
 
         if (isMuted)
         {
-            Mute();
+            Unmute();
         }
         else
         {
-            Unmute();
+            Mute();
         }
     }
 
     void Mute()
     {
-        ToggleMenuMusic(false);
-        isMuted = false;
-        NotifyAll(EventType.UNMUTE);
+        menuMusic.mute = true;
+        NotifyAll(EventType.MUTE);
     }
 
     void Unmute()
     {
-        ToggleMenuMusic(true);
-        isMuted = true;
-        NotifyAll(EventType.MUTE);
+        menuMusic.mute = false;
+        NotifyAll(EventType.UNMUTE);
+    }
+   
+    public void GameOver()
+    {
+        coroutine = StartCoroutine(GameOverFadeOut());
     }
 
-    void ToggleMenuMusic(bool toMute)
+    IEnumerator GameOverFadeOut()
     {
-        if (toMute)
+        while (deltaTime < GAME_OVER_FADE_OUT_TIME)
         {
-            menuMusic.Pause();
+            menuMusic.pitch = Mathf.SmoothStep(1, 0, deltaTime / GAME_OVER_FADE_OUT_TIME);
+            deltaTime += Time.deltaTime;
+            yield return null;
         }
-        else
+
+        menuMusic.Stop();
+        deltaTime = 0;
+        menuMusic.pitch = 1;
+    }
+
+    public void StartMusicAfterGameOver()
+    {
+        StartCoroutine(WaitForGameOverFadeOut(coroutine));
+    }
+
+    IEnumerator WaitForGameOverFadeOut(Coroutine c)
+    {
+        yield return c;
+        if (!menuMusic.isPlaying)
         {
-            menuMusic.UnPause();
-        }
+            menuMusic.Play();
+        }   
     }
 
     /********************************************

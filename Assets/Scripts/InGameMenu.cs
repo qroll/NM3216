@@ -10,8 +10,11 @@ public class InGameMenu : MonoBehaviour, IObserver
     void Start()
     {
         // Subscribe to and initialize music mute status
-        MusicManager.Instance.Subscribe(this);
-        cross.SetActive(MusicManager.Instance.isMuted);
+        if (MusicManager.Instance != null)
+        {
+            MusicManager.Instance.Subscribe(this);
+            cross.SetActive(MusicManager.Instance.isMuted);
+        }
 
         // Position the menu at the top right corner of the screen
         // First, convert coordinates from world space to canvas space
@@ -27,7 +30,10 @@ public class InGameMenu : MonoBehaviour, IObserver
 
     void OnDestroy()
     {
-        MusicManager.Instance.Unsubscribe(this);
+        if (MusicManager.Instance != null)
+        {
+            MusicManager.Instance.Unsubscribe(this);
+        }
     }
 
     /**********************************************

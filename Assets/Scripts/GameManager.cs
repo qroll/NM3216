@@ -158,13 +158,12 @@ public class GameManager : MonoBehaviour
     private static Dictionary<Enemy.Type, System.Func<int, float>> modifierFormula = new Dictionary<Enemy.Type, System.Func<int, float>>()
     {
         { Enemy.Type.FLY, x => 0.0f },
-        { Enemy.Type.BEE, x => Mathf.Ceil(3 - 3 / (1 + Mathf.Exp(0.5f * Mathf.Log(9) * (3 - x)))) },
-        { Enemy.Type.LADYBUG, x => Mathf.Ceil(3 - 3 / (1 + Mathf.Exp(0.5f * Mathf.Log(9) * (3 - x)))) },
-        { Enemy.Type.BEETLE, x => Mathf.Ceil(3 - 3 / (1 + Mathf.Exp(0.5f * Mathf.Log(9) * (3 - x)))) },
-        { Enemy.Type.FIREFLY, x => Mathf.Ceil(3 - 3 / (1 + Mathf.Exp(0.5f * Mathf.Log(9) * (3 - x)))) }
+        { Enemy.Type.BEE, x => (28 / 9.0f) * (1 - 1 / (1 + Mathf.Exp(0.5f * Mathf.Log(9) * (3 - x)))) },
+        { Enemy.Type.LADYBUG, x => (28 / 9.0f) * (1 - 1 / (1 + Mathf.Exp(0.5f * Mathf.Log(9) * (3 - x)))) },
+        { Enemy.Type.BEETLE, x => (28 / 9.0f) * (1 - 1 / (1 + Mathf.Exp(0.5f * Mathf.Log(9) * (3 - x)))) },
+        { Enemy.Type.FIREFLY, x => (28 / 9.0f) * (1 - 1 / (1 + Mathf.Exp(0.5f * Mathf.Log(9) * (3 - x)))) }
     };
-
-    // Use this for initialization
+    
     void Start()
     {
         CDebug.SetDebugLoggingLevel((int)debugLevel);
@@ -254,6 +253,8 @@ public class GameManager : MonoBehaviour
         };
 
         Time.timeScale = 1.0f;
+
+        MusicManager.Instance.StartMusicAfterGameOver();
     }
 
     IEnumerator DisableControlsOverlay()
@@ -777,17 +778,7 @@ public class GameManager : MonoBehaviour
 
         if (infestationCount >= maxNumEnemies)
         {
-            CDebug.Log(CDebug.EDebugLevel.INFO, "game over");
-            inGameUI.SetActive(false);
-            endGameUI.SetActive(true);
-            isGameOver = true;
-
-            GameObject[] gos = GameObject.FindGameObjectsWithTag("Enemy");
-            for (int i = 0; i < gos.Length; i++)
-            {
-                Enemy script = (Enemy)gos[i].GetComponent("Enemy");
-                script.movement = 0;
-            }
+            GameOver();
         }
     }
 
@@ -853,6 +844,23 @@ public class GameManager : MonoBehaviour
         CDebug.Log(CDebug.EDebugLevel.DEBUG, "count=" + count);
         infestationCount = count;
         babyFrogAnimator.SetInteger("count", infestationCount);
+    }
+
+    void GameOver()
+    {
+        CDebug.Log(CDebug.EDebugLevel.INFO, "game over");
+        inGameUI.SetActive(false);
+        endGameUI.SetActive(true);
+        isGameOver = true;
+
+        MusicManager.Instance.GameOver();
+
+        GameObject[] gos = GameObject.FindGameObjectsWithTag("Enemy");
+        for (int i = 0; i < gos.Length; i++)
+        {
+            Enemy script = (Enemy)gos[i].GetComponent("Enemy");
+            script.movement = 0;
+        }
     }
     
 }
