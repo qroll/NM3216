@@ -104,6 +104,11 @@ public class MusicManager : MonoBehaviour, IObservable
    
     public void GameOver()
     {
+        if (!isEnabled)
+        {
+            return;
+        }
+
         coroutine = StartCoroutine(GameOverFadeOut());
     }
 
@@ -123,6 +128,11 @@ public class MusicManager : MonoBehaviour, IObservable
 
     public void StartMusicAfterGameOver()
     {
+        if (!isEnabled)
+        {
+            return;
+        }
+
         StartCoroutine(WaitForGameOverFadeOut(coroutine));
     }
 

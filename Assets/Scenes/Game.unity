@@ -7194,7 +7194,7 @@ MonoBehaviour:
   initialEnemyType: 0
   moderateDifficulty: 1
   successScenario: 1
-  deltaSpawnRate: 0.02
+  deltaSpawnRate: 0.04
   minSpawnRate: 0.1
   deltaSpawnNum: 0.1
   maxSpawnNum: 1

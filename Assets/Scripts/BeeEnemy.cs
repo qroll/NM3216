@@ -26,7 +26,7 @@ public class BeeEnemy : Enemy
             return;
         }
 
-        if (!hasStopped && transform.position.magnitude <= (distance + 1))
+        if (!hasStopped && transform.position.magnitude <= distance)
         {
             isPaused = true;
             hasStopped = true;

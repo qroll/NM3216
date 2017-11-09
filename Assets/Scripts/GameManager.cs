@@ -253,7 +253,7 @@ public class GameManager : MonoBehaviour
         };
 
         Time.timeScale = 1.0f;
-
+        
         MusicManager.Instance.StartMusicAfterGameOver();
     }
 
@@ -379,7 +379,7 @@ public class GameManager : MonoBehaviour
                 ((FlyEnemy)enemyScript).ForceMove(Time.deltaTime);
                 break;
             case Enemy.Type.BEE:
-                Vector3 midPt = Camera.main.ViewportToWorldPoint(new Vector3(0.5f, 0.2f, distFromCamera));
+                Vector3 midPt = Camera.main.ViewportToWorldPoint(new Vector3(0.5f, 0.22f, distFromCamera));
                 float distance = midPt.magnitude;
                 ((BeeEnemy)enemyScript).distance = distance;
                 break;
